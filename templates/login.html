@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Log in - IssueFlow{% endblock %}
+{% block title %}Log in - BugTracker{% endblock %}
 {% block body_class %}auth-page{% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
 
             <button type="submit" style="width: 100%; min-height: 40px; margin-top: 12px;">Log in</button>
         </form>
-        <p class="muted">New to IssueFlow? <a href="{{ url_for('auth.register') }}">Sign up for an account</a></p>
+        <p class="muted">New to BugTracker? <a href="{{ url_for('auth.register') }}">Sign up for an account</a></p>
     </section>
 </div>
 {% endblock %}

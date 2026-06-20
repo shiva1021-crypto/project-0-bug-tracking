@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}IssueFlow — Modern Project & Issue Tracking{% endblock %}
+{% block title %}BugTracker — Modern Project & Issue Tracking{% endblock %}
 {% block body_class %}landing-page{% endblock %}
 
 {% block content %}
@@ -18,13 +18,13 @@
                     <a class="button" href="{{ url_for('project.board') }}">Open Kanban board <span>→</span></a>
                     <a class="button button-secondary" href="{{ url_for('bug.add_bug') }}">Create an issue</a>
                 {% else %}
-                    <a class="button" href="{{ url_for('auth.register') }}">Get IssueFlow free <span>→</span></a>
+                    <a class="button" href="{{ url_for('auth.register') }}">Get BugTracker free <span>→</span></a>
                     <a class="button button-secondary" href="{{ url_for('auth.login') }}">Sign In</a>
                 {% endif %}
             </div>
         </div>
 
-        <div class="product-preview" aria-label="IssueFlow Kanban board preview">
+        <div class="product-preview" aria-label="BugTracker Kanban board preview">
             <div class="preview-window-bar">
                 <div class="preview-dots"><span></span><span></span><span></span></div>
                 <div class="preview-address">issueflow.com/workspace/board</div>
@@ -156,10 +156,10 @@
     <footer class="landing-footer">
         <div class="footer-brand">
             <span class="brand-mark" style="width: 24px; height: 24px; font-size: 11px;">IF</span>
-            <strong>IssueFlow</strong>
+            <strong>BugTracker</strong>
         </div>
         <p>Built with Python Flask, MySQL and Atlassian Design tokens.</p>
-        <span>&copy; 2026 IssueFlow. All rights reserved.</span>
+        <span>&copy; 2026 BugTracker. All rights reserved.</span>
     </footer>
 </div>
 {% endblock %}

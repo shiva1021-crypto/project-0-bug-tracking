@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Kanban Board — IssueFlow{% endblock %}
+{% block title %}Kanban Board — BugTracker{% endblock %}
 
 {% block content %}
 <style>
@@ -268,7 +268,7 @@
 <nav class="jira-breadcrumbs">
     <span>Spaces</span>
     <span>/</span>
-    <span>{{ current_organization_name or "IssueFlow Workspace" }}</span>
+    <span>{{ current_organization_name or "BugTracker Workspace" }}</span>
 </nav>
 
 <!-- Page Heading -->
@@ -278,7 +278,7 @@
             {{ (current_organization_name or "IF")[:2]|upper }}
         </div>
         <div class="board-title-text">
-            <h1>{{ current_organization_name or "IssueFlow Workspace" }}</h1>
+            <h1>{{ current_organization_name or "BugTracker Workspace" }}</h1>
         </div>
     </div>
 </div>

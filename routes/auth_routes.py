@@ -125,7 +125,7 @@ def register():
                 )
                 queue_email(
                     email,
-                    "Verify your IssueFlow access request",
+                    "Verify your Software Bug Tracking and Reporting Tool access request",
                     f"Verify your email before an administrator can approve access:\n\n{verification_url}",
                 )
                 flash("Access request submitted. Check your email to verify it before administrator approval.", "success")
@@ -133,7 +133,7 @@ def register():
                 for admin_email in admin_emails:
                     queue_email(
                         admin_email,
-                        "New IssueFlow access request",
+                        "New Software Bug Tracking and Reporting Tool access request",
                         f"{full_name} ({email}) requested access to {organization_name}.",
                     )
                 flash("Access request submitted. An administrator must approve it before login.", "success")
@@ -182,7 +182,7 @@ def verify_registration(token):
     for admin_email in admin_emails:
         queue_email(
             admin_email,
-            "Verified IssueFlow access request",
+            "Verified Software Bug Tracking and Reporting Tool access request",
             f"{registration['full_name']} ({registration['email']}) is ready for approval.",
         )
     flash("Email verified. An administrator can now approve your access request.", "success")

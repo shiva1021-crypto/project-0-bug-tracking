@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}IssueFlow — Work Management{% endblock %}</title>
+    <title>{% block title %}BugTracker — Work Management{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -14,7 +14,7 @@
                 <button class="nav-toggle" type="button" aria-label="Toggle navigation" style="display: none;">Menu</button>
                 <a class="brand" href="{{ url_for('index') }}">
                     <span class="brand-mark">IF</span>
-                    <span>IssueFlow<small>Work management</small></span>
+                    <span>BugTracker<small>Work management</small></span>
                 </a>
                 {% if current_user_id %}
                 <nav class="header-nav">
@@ -55,7 +55,7 @@
                     <div class="sidebar-project-info">
                         <span class="sidebar-project-avatar">IF</span>
                         <div class="sidebar-project-info-text">
-                            <span class="sidebar-project-name">IssueFlow Workspace</span>
+                            <span class="sidebar-project-name">BugTracker Workspace</span>
                             <span class="sidebar-project-type">Software Project</span>
                         </div>
                     </div>

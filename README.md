@@ -1,4 +1,4 @@
-# IssueFlow — Work Management
+# Software Bug Tracking and Reporting Tool — Work Management
 
 A Jira-inspired bug tracking and agile project management tool built with Flask. Supports multi-tenant organizations, role-based access, Kanban boards, sprint planning, backlog management, issue hierarchies (Epic → Story → Task → Subtask), and burndown charts.
 
@@ -134,7 +134,7 @@ Developers can update the status of issues assigned to them.
 
 ### 4. Issue Types & Hierarchy
 
-IssueFlow supports a hierarchy inspired by Jira:
+Software Bug Tracking and Reporting Tool supports a hierarchy inspired by Jira:
 
 ```
 Epic
@@ -232,7 +232,7 @@ The **Users** admin page (`/admin/users`) allows admins to:
 
 ### 12. Email Notifications
 
-When configured with SMTP credentials, IssueFlow sends email notifications for:
+When configured with SMTP credentials, Software Bug Tracking and Reporting Tool sends email notifications for:
 - Issue assignment
 - Status changes (to the reporter and watchers)
 - Registration approval/rejection

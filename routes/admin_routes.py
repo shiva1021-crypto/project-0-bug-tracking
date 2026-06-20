@@ -113,7 +113,7 @@ def approve_registration(request_id):
     if approved:
         queue_email(
             registration["email"],
-            "Your IssueFlow access was approved",
+            "Your Software Bug Tracking and Reporting Tool access was approved",
             "Your registration request was approved. You can now sign in.",
         )
         flash("Registration approved.", "success")
@@ -149,7 +149,7 @@ def reject_registration(request_id):
     if registration:
         queue_email(
             registration["email"],
-            "Your IssueFlow access request",
+            "Your Software Bug Tracking and Reporting Tool access request",
             "Your registration request was not approved. Contact your organization administrator for help.",
         )
         flash("Registration rejected.", "success")
