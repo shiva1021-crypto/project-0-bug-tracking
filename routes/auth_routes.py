@@ -1,4 +1,5 @@
 import hashlib
+import re
 import secrets
 from datetime import datetime, timezone
 
@@ -46,8 +47,25 @@ def register():
                 cursor.execute("SELECT id FROM organizations WHERE name = %s", (organization_name,))
                 organization = cursor.fetchone()
                 if not organization:
-                    flash("Organization not found. Ask your administrator for the exact name.", "error")
-                    return redirect(url_for("auth.register"))
+                    if len(organization_name) > 120:
+                        flash("Organization name is too long.", "error")
+                        return redirect(url_for("auth.register"))
+                    cursor.execute(
+                        "INSERT INTO organizations (name) VALUES (%s)",
+                        (organization_name,),
+                    )
+                    org_id = cursor.lastrowid
+                    cursor.execute(
+                        "INSERT INTO users (organization_id, full_name, email, password_hash, role) VALUES (%s, %s, %s, %s, 'admin')",
+                        (org_id, full_name, email, generate_password_hash(password)),
+                    )
+                    project_key = re.sub(r"[^A-Za-z0-9]", "", organization_name).upper()[:6] or f"ORG{org_id}"
+                    cursor.execute(
+                        "INSERT INTO projects (organization_id, name, project_key) VALUES (%s, %s, %s)",
+                        (org_id, "General", project_key),
+                    )
+                    flash("Organization created. You can now log in as its administrator.", "success")
+                    return redirect(url_for("auth.login"))
 
                 cursor.execute(
                     """

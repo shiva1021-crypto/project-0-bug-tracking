@@ -6,8 +6,9 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config, DatabaseUnavailable, db_cursor
 from routes.admin_routes import admin_bp
 from routes.auth_routes import auth_bp
-from routes.bug_routes import bug_bp
-from routes import workflow_routes  # noqa: F401 - attaches workflow routes to bug_bp
+from routes.bug_blueprint import bug_bp
+from routes.bug_routes import register_bug_routes
+from routes.workflow_routes import register_workflow_routes
 from routes.report_routes import report_bp
 from routes.project_routes import project_bp
 from utils.decorators import login_required
@@ -31,6 +32,9 @@ def create_app():
 
     app.before_request(validate_csrf)
     app.after_request(set_security_headers)
+
+    register_bug_routes(bug_bp)
+    register_workflow_routes(bug_bp)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(bug_bp)
