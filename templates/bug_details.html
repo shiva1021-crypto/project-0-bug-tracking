@@ -1,27 +1,39 @@
 {% extends "base.html" %}
 
-{% block title %}Bug #{{ bug.id }} - Bug Tracking Tool{% endblock %}
+{% block title %}{{ bug.issue_key }} - Bug Tracking Tool{% endblock %}
 
 {% block content %}
 <div class="page-heading">
     <div>
-        <p class="eyebrow">Bug #{{ bug.id }}</p>
+        <p class="eyebrow">{{ bug.project_name }} · {{ bug.issue_key }}</p>
         <h1>{{ bug.title }}</h1>
     </div>
     {% if current_user_role in ['admin', 'project_manager'] or bug.reporter_id == current_user_id %}
-        <a class="button button-secondary" href="{{ url_for('bug.edit_bug', bug_id=bug.id) }}">Edit Bug</a>
+        <a class="button button-secondary" href="{{ url_for('bug.edit_bug', bug_id=bug.id) }}">Edit Issue</a>
     {% endif %}
 </div>
 
 <section class="details-layout">
     <article class="panel details-card">
         <div class="meta-grid">
+            <div><span>Type</span><strong>{{ bug.issue_type }}</strong></div>
             <div><span>Priority</span><strong>{{ bug.priority }}</strong></div>
             <div><span>Severity</span><strong>{{ bug.severity }}</strong></div>
             <div><span>Status</span><strong>{{ bug.status }}</strong></div>
             <div><span>Assigned</span><strong>{{ bug.developer_name or "Not Assigned" }}</strong></div>
             <div><span>Category</span><strong>{{ bug.category or "General" }}</strong></div>
+            <div><span>Story Points</span><strong>{{ bug.story_points or "Not estimated" }}</strong></div>
+            <div><span>Due Date</span><strong>{{ bug.due_date or "None" }}</strong></div>
         </div>
+
+        {% if bug.parent_id %}
+            <p><strong>Parent:</strong> <a href="{{ url_for('bug.bug_details', bug_id=bug.parent_id) }}">{{ bug.parent_issue_key }} · {{ bug.parent_title }}</a></p>
+        {% endif %}
+        {% if bug.label_list %}
+            <div class="label-row">
+                {% for label in bug.label_list %}<span class="issue-label">{{ label }}</span>{% endfor %}
+            </div>
+        {% endif %}
 
         <h2>Description</h2>
         <p>{{ bug.description }}</p>
@@ -42,6 +54,18 @@
     </article>
 
     <aside class="side-panel">
+        <form class="panel" method="POST" action="{{ url_for('bug.toggle_watch', bug_id=bug.id) }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <h2>Watchers</h2>
+            <p class="muted">{{ watcher_info.watcher_count }} watching this issue</p>
+            {% if watcher_info.is_watching %}
+                <input type="hidden" name="action" value="unwatch">
+                <button class="button-secondary" type="submit">Stop Watching</button>
+            {% else %}
+                <input type="hidden" name="action" value="watch">
+                <button type="submit">Watch Issue</button>
+            {% endif %}
+        </form>
         {% if current_user_role in ['admin', 'project_manager'] %}
             <form class="panel" method="POST" action="{{ url_for('bug.assign_bug', bug_id=bug.id) }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -77,6 +101,20 @@
         {% endif %}
     </aside>
 </section>
+
+{% if children %}
+    <section class="panel">
+        <h2>Child Issues</h2>
+        <div class="issue-children">
+            {% for child in children %}
+                <a href="{{ url_for('bug.bug_details', bug_id=child.id) }}">
+                    <strong>{{ child.issue_key }}</strong> · {{ child.issue_type }} · {{ child.title }}
+                    <span class="status">{{ child.status }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
 
 <section class="details-layout lower">
     <article class="panel">

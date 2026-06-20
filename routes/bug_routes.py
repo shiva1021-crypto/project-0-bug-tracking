@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from uuid import uuid4
 
 from flask import (
@@ -25,6 +26,7 @@ bug_bp = Blueprint("bug", __name__)
 PRIORITIES = ("Low", "Medium", "High", "Urgent")
 SEVERITIES = ("Minor", "Major", "Critical", "Blocker")
 STATUSES = ("Open", "In Progress", "Resolved", "Closed")
+ISSUE_TYPES = ("Epic", "Story", "Task", "Bug", "Subtask")
 DEFAULT_CATEGORIES = ("General", "UI", "Backend", "Database", "Security", "Performance", "Integration")
 
 
@@ -84,6 +86,42 @@ def get_developers(cursor):
     return cursor.fetchall()
 
 
+def get_projects(cursor):
+    cursor.execute(
+        """
+        SELECT id, name, project_key
+        FROM projects
+        WHERE organization_id = %s
+        ORDER BY name
+        """,
+        (session["organization_id"],),
+    )
+    return cursor.fetchall()
+
+
+def normalized_labels(raw_labels):
+    labels = []
+    for value in raw_labels.split(","):
+        label = value.strip().lower().replace(" ", "-")
+        if label and label not in labels:
+            labels.append(label[:30])
+    return ",".join(labels[:10]) or None
+
+
+def parsed_story_points(raw_value):
+    if not raw_value:
+        return None
+    if not raw_value.isdigit() or not 1 <= int(raw_value) <= 100:
+        raise ValueError("Story points must be between 1 and 100.")
+    return int(raw_value)
+
+
+def parsed_due_date(raw_value):
+    if not raw_value:
+        return None
+    return date.fromisoformat(raw_value)
+
+
 @bug_bp.route("/dashboard")
 @login_required
 def dashboard():
@@ -108,7 +146,7 @@ def dashboard():
 
     cursor.execute(
         """
-        SELECT bugs.id, bugs.title, bugs.priority, bugs.severity, bugs.status,
+        SELECT bugs.id, bugs.issue_key, bugs.issue_type, bugs.title, bugs.priority, bugs.severity, bugs.status,
                bugs.created_at, reporter.full_name AS reporter_name,
                developer.full_name AS developer_name
         FROM bugs
@@ -129,7 +167,7 @@ def dashboard():
 
 
 @bug_bp.route("/bugs/add", methods=["GET", "POST"])
-@role_required("tester", "admin", "project_manager")
+@role_required("tester", "developer", "admin", "project_manager")
 def add_bug():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
@@ -139,23 +177,81 @@ def add_bug():
         external_issue_url = request.form.get("external_issue_url", "").strip()
         priority = request.form.get("priority", "")
         severity = request.form.get("severity", "")
+        project_id = request.form.get("project_id", "")
+        issue_type = request.form.get("issue_type", "Bug")
+        parent_id = request.form.get("parent_id", "")
+        labels = normalized_labels(request.form.get("labels", ""))
 
-        if not title or not description or priority not in PRIORITIES or severity not in SEVERITIES:
+        try:
+            story_points = parsed_story_points(request.form.get("story_points", ""))
+            due_date = parsed_due_date(request.form.get("due_date", ""))
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("bug.add_bug"))
+
+        if (
+            not title
+            or not description
+            or priority not in PRIORITIES
+            or severity not in SEVERITIES
+            or issue_type not in ISSUE_TYPES
+            or not project_id.isdigit()
+        ):
             flash("Please fill all required bug fields with valid values.", "error")
             return redirect(url_for("bug.add_bug"))
 
         screenshot_filename = save_screenshot(request.files.get("screenshot"))
 
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT id, project_key, next_issue_number
+            FROM projects
+            WHERE id = %s AND organization_id = %s
+            FOR UPDATE
+            """,
+            (int(project_id), session["organization_id"]),
+        )
+        project = cursor.fetchone()
+        if not project:
+            cursor.close()
+            conn.close()
+            flash("Select a valid project.", "error")
+            return redirect(url_for("bug.add_bug"))
+
+        valid_parent_id = None
+        if parent_id.isdigit():
+            cursor.execute(
+                """
+                SELECT id FROM bugs
+                WHERE id = %s AND project_id = %s AND organization_id = %s
+                """,
+                (int(parent_id), project["id"], session["organization_id"]),
+            )
+            parent = cursor.fetchone()
+            valid_parent_id = parent["id"] if parent else None
+
+        issue_number = project["next_issue_number"]
+        issue_key = f"{project['project_key']}-{issue_number}"
+        cursor.execute(
+            "UPDATE projects SET next_issue_number = next_issue_number + 1 WHERE id = %s",
+            (project["id"],),
+        )
         cursor.execute(
             """
             INSERT INTO bugs
-            (organization_id, title, description, reproduction_steps, category, priority, severity, reporter_id, screenshot_path, external_issue_url)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (organization_id, project_id, issue_key, issue_type, parent_id,
+             title, description, reproduction_steps, category, priority, severity,
+             reporter_id, screenshot_path, external_issue_url, labels, story_points, due_date)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 session["organization_id"],
+                project["id"],
+                issue_key,
+                issue_type,
+                valid_parent_id,
                 title,
                 description,
                 reproduction_steps,
@@ -165,6 +261,9 @@ def add_bug():
                 session["user_id"],
                 screenshot_filename,
                 external_issue_url or None,
+                labels,
+                story_points,
+                due_date,
             ),
         )
         bug_id = cursor.lastrowid
@@ -173,16 +272,42 @@ def add_bug():
             INSERT INTO bug_history (bug_id, changed_by, new_status, change_note)
             VALUES (%s, %s, %s, %s)
             """,
-            (bug_id, session["user_id"], "Open", "Bug reported"),
+            (bug_id, session["user_id"], "Open", f"{issue_type} {issue_key} created"),
         )
         conn.commit()
         cursor.close()
         conn.close()
 
-        flash("Bug reported successfully.", "success")
+        flash(f"Issue {issue_key} created successfully.", "success")
         return redirect(url_for("bug.bug_details", bug_id=bug_id))
 
-    return render_template("add_bug.html", priorities=PRIORITIES, severities=SEVERITIES, categories=DEFAULT_CATEGORIES)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    projects = get_projects(cursor)
+    cursor.execute(
+        """
+        SELECT id, issue_key, issue_type, title, project_id
+        FROM bugs
+        WHERE organization_id = %s AND issue_type IN ('Epic', 'Story', 'Task', 'Bug')
+        ORDER BY created_at DESC
+        """,
+        (session["organization_id"],),
+    )
+    parents = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    if not projects:
+        flash("Create a project before adding issues.", "error")
+        return redirect(url_for("project.projects"))
+    return render_template(
+        "add_bug.html",
+        priorities=PRIORITIES,
+        severities=SEVERITIES,
+        categories=DEFAULT_CATEGORIES,
+        issue_types=ISSUE_TYPES,
+        projects=projects,
+        parents=parents,
+    )
 
 
 @bug_bp.route("/bugs")
@@ -192,13 +317,17 @@ def view_bugs():
     priority = request.args.get("priority", "")
     severity = request.args.get("severity", "")
     assigned_to = request.args.get("assigned_to", "")
+    project_id = request.args.get("project", "")
+    issue_type = request.args.get("issue_type", "")
     search = request.args.get("q", "").strip()
 
     select_query = """
-        SELECT bugs.id, bugs.title, bugs.description, bugs.category, bugs.priority, bugs.severity,
-               bugs.status, bugs.created_at, reporter.full_name AS reporter_name,
-               developer.full_name AS developer_name
+        SELECT bugs.id, bugs.issue_key, bugs.issue_type, bugs.title, bugs.description,
+               bugs.category, bugs.priority, bugs.severity, bugs.status, bugs.created_at,
+               bugs.story_points, bugs.due_date, reporter.full_name AS reporter_name,
+               developer.full_name AS developer_name, projects.name AS project_name
         FROM bugs
+        JOIN projects ON bugs.project_id = projects.id
         JOIN users AS reporter ON bugs.reporter_id = reporter.id
         LEFT JOIN users AS developer ON bugs.assigned_to = developer.id
         WHERE bugs.organization_id = %s
@@ -217,9 +346,15 @@ def view_bugs():
     if assigned_to.isdigit():
         select_query += " AND bugs.assigned_to = %s"
         params.append(int(assigned_to))
+    if project_id.isdigit():
+        select_query += " AND bugs.project_id = %s"
+        params.append(int(project_id))
+    if issue_type in ISSUE_TYPES:
+        select_query += " AND bugs.issue_type = %s"
+        params.append(issue_type)
     if search:
-        select_query += " AND (bugs.title LIKE %s OR bugs.description LIKE %s)"
-        params.extend([f"%{search}%", f"%{search}%"])
+        select_query += " AND (bugs.issue_key LIKE %s OR bugs.title LIKE %s OR bugs.description LIKE %s)"
+        params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -235,6 +370,7 @@ def view_bugs():
     cursor.execute(query, [*params, pagination["page_size"], offset])
     bugs = cursor.fetchall()
     developers = get_developers(cursor)
+    projects = get_projects(cursor)
     cursor.close()
     conn.close()
 
@@ -245,6 +381,8 @@ def view_bugs():
         statuses=STATUSES,
         priorities=PRIORITIES,
         severities=SEVERITIES,
+        issue_types=ISSUE_TYPES,
+        projects=projects,
         filters=request.args,
         pagination=pagination,
         page_args={key: value for key, value in request.args.items() if key != "page"},
@@ -260,10 +398,14 @@ def bug_details(bug_id):
     cursor.execute(
         """
         SELECT bugs.*, reporter.full_name AS reporter_name,
-               developer.full_name AS developer_name
+               developer.full_name AS developer_name,
+               projects.name AS project_name, projects.project_key,
+               parent.issue_key AS parent_issue_key, parent.title AS parent_title
         FROM bugs
+        JOIN projects ON bugs.project_id = projects.id
         JOIN users AS reporter ON bugs.reporter_id = reporter.id
         LEFT JOIN users AS developer ON bugs.assigned_to = developer.id
+        LEFT JOIN bugs AS parent ON bugs.parent_id = parent.id
         WHERE bugs.id = %s AND bugs.organization_id = %s
         """,
         (bug_id, session["organization_id"]),
@@ -273,6 +415,29 @@ def bug_details(bug_id):
         cursor.close()
         conn.close()
         abort(404)
+    bug["label_list"] = [label.strip() for label in (bug["labels"] or "").split(",") if label.strip()]
+
+    cursor.execute(
+        """
+        SELECT id, issue_key, issue_type, title, status
+        FROM bugs
+        WHERE parent_id = %s AND organization_id = %s
+        ORDER BY created_at
+        """,
+        (bug_id, session["organization_id"]),
+    )
+    children = cursor.fetchall()
+
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS watcher_count,
+               COALESCE(SUM(user_id = %s), 0) AS is_watching
+        FROM issue_watchers
+        WHERE bug_id = %s
+        """,
+        (session["user_id"], bug_id),
+    )
+    watcher_info = cursor.fetchone()
 
     cursor.execute(
         """
@@ -313,6 +478,8 @@ def bug_details(bug_id):
         bug=bug,
         comments=comments,
         history=history,
+        children=children,
+        watcher_info=watcher_info,
         developers=developers,
         statuses=STATUSES,
         can_update_status=can_update_bug_status(bug, session["user_id"], session.get("role")),
@@ -350,8 +517,24 @@ def edit_bug(bug_id):
         external_issue_url = request.form.get("external_issue_url", "").strip()
         priority = request.form.get("priority", "")
         severity = request.form.get("severity", "")
+        issue_type = request.form.get("issue_type", "Bug")
+        parent_id = request.form.get("parent_id", "")
+        labels = normalized_labels(request.form.get("labels", ""))
 
-        if not title or not description or priority not in PRIORITIES or severity not in SEVERITIES:
+        try:
+            story_points = parsed_story_points(request.form.get("story_points", ""))
+            due_date = parsed_due_date(request.form.get("due_date", ""))
+        except ValueError as exc:
+            flash(str(exc), "error")
+            return redirect(url_for("bug.edit_bug", bug_id=bug_id))
+
+        if (
+            not title
+            or not description
+            or priority not in PRIORITIES
+            or severity not in SEVERITIES
+            or issue_type not in ISSUE_TYPES
+        ):
             flash("Please provide valid bug details.", "error")
             return redirect(url_for("bug.edit_bug", bug_id=bug_id))
 
@@ -360,12 +543,26 @@ def edit_bug(bug_id):
         if uploaded:
             screenshot_filename = uploaded
 
+        valid_parent_id = None
+        if parent_id.isdigit() and int(parent_id) != bug_id:
+            cursor.execute(
+                """
+                SELECT id FROM bugs
+                WHERE id = %s AND project_id = %s AND organization_id = %s
+                """,
+                (int(parent_id), bug["project_id"], session["organization_id"]),
+            )
+            parent = cursor.fetchone()
+            valid_parent_id = parent["id"] if parent else None
+
         cursor.execute(
             """
             UPDATE bugs
             SET title = %s, description = %s, reproduction_steps = %s,
                 category = %s, priority = %s, severity = %s,
-                screenshot_path = %s, external_issue_url = %s
+                screenshot_path = %s, external_issue_url = %s,
+                issue_type = %s, parent_id = %s, labels = %s,
+                story_points = %s, due_date = %s
             WHERE id = %s AND organization_id = %s
             """,
             (
@@ -377,6 +574,11 @@ def edit_bug(bug_id):
                 severity,
                 screenshot_filename,
                 external_issue_url or None,
+                issue_type,
+                valid_parent_id,
+                labels,
+                story_points,
+                due_date,
                 bug_id,
                 session["organization_id"],
             ),
@@ -395,9 +597,28 @@ def edit_bug(bug_id):
         flash("Bug updated successfully.", "success")
         return redirect(url_for("bug.bug_details", bug_id=bug_id))
 
+    cursor.execute(
+        """
+        SELECT id, issue_key, issue_type, title
+        FROM bugs
+        WHERE organization_id = %s AND project_id = %s AND id != %s
+          AND issue_type IN ('Epic', 'Story', 'Task', 'Bug')
+        ORDER BY created_at DESC
+        """,
+        (session["organization_id"], bug["project_id"], bug_id),
+    )
+    parents = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template("edit_bug.html", bug=bug, priorities=PRIORITIES, severities=SEVERITIES, categories=DEFAULT_CATEGORIES)
+    return render_template(
+        "edit_bug.html",
+        bug=bug,
+        priorities=PRIORITIES,
+        severities=SEVERITIES,
+        categories=DEFAULT_CATEGORIES,
+        issue_types=ISSUE_TYPES,
+        parents=parents,
+    )
 
 
 @bug_bp.route("/bugs/<int:bug_id>/assign", methods=["POST"])
@@ -510,7 +731,7 @@ def update_status(bug_id):
 
         cursor.execute(
             """
-            SELECT reporter.email, reporter.full_name
+            SELECT reporter.email, reporter.full_name, bugs.issue_key
             FROM bugs
             JOIN users AS reporter ON bugs.reporter_id = reporter.id
             WHERE bugs.id = %s AND bugs.organization_id = %s
@@ -518,14 +739,33 @@ def update_status(bug_id):
             (bug_id, session["organization_id"]),
         )
         reporter = cursor.fetchone()
+        cursor.execute(
+            """
+            SELECT users.email, users.full_name
+            FROM issue_watchers
+            JOIN users ON issue_watchers.user_id = users.id
+            WHERE issue_watchers.bug_id = %s AND users.organization_id = %s
+              AND users.id != %s
+            """,
+            (bug_id, session["organization_id"], session["user_id"]),
+        )
+        watchers = cursor.fetchall()
 
     flash("Bug status updated successfully.", "success")
     if reporter:
         send_email(
             reporter["email"],
-            f"Bug status updated: #{bug_id}",
-            f"Hello {reporter['full_name']},\n\nBug #{bug_id} status changed from {old_status} to {new_status}.",
+            f"Issue status updated: {reporter['issue_key']}",
+            f"Hello {reporter['full_name']},\n\n{reporter['issue_key']} status changed from {old_status} to {new_status}.",
         )
+    for watcher in watchers:
+        send_email(
+            watcher["email"],
+            f"Watched issue updated: {reporter['issue_key']}",
+            f"Hello {watcher['full_name']},\n\n{reporter['issue_key']} status changed from {old_status} to {new_status}.",
+        )
+    if request.form.get("return_to") == "board":
+        return redirect(url_for("project.board", project=request.form.get("project", "")))
     return redirect(url_for("bug.bug_details", bug_id=bug_id))
 
 
@@ -557,4 +797,38 @@ def add_comment(bug_id):
     conn.close()
 
     flash("Comment added.", "success")
+    return redirect(url_for("bug.bug_details", bug_id=bug_id))
+
+
+@bug_bp.route("/bugs/<int:bug_id>/watch", methods=["POST"])
+@login_required
+def toggle_watch(bug_id):
+    action = request.form.get("action", "watch")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id FROM bugs WHERE id = %s AND organization_id = %s",
+        (bug_id, session["organization_id"]),
+    )
+    if not cursor.fetchone():
+        cursor.close()
+        conn.close()
+        abort(404)
+
+    if action == "unwatch":
+        cursor.execute(
+            "DELETE FROM issue_watchers WHERE bug_id = %s AND user_id = %s",
+            (bug_id, session["user_id"]),
+        )
+        message = "You are no longer watching this issue."
+    else:
+        cursor.execute(
+            "INSERT IGNORE INTO issue_watchers (bug_id, user_id) VALUES (%s, %s)",
+            (bug_id, session["user_id"]),
+        )
+        message = "You are now watching this issue."
+    conn.commit()
+    cursor.close()
+    conn.close()
+    flash(message, "success")
     return redirect(url_for("bug.bug_details", bug_id=bug_id))

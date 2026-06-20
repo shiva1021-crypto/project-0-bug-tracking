@@ -1,13 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}Report Bug - Bug Tracking Tool{% endblock %}
+{% block title %}Create Issue - Bug Tracking Tool{% endblock %}
 
 {% block content %}
 <section class="form-card">
-    <h1>Report New Bug</h1>
+    <h1>Create Issue</h1>
     <form method="POST" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <label for="title">Bug Title</label>
+        <div class="two-column">
+            <div>
+                <label for="project_id">Project</label>
+                <select id="project_id" name="project_id" required>
+                    {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.project_key }} · {{ project.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="issue_type">Work Type</label>
+                <select id="issue_type" name="issue_type" required>
+                    {% for issue_type in issue_types %}
+                        <option value="{{ issue_type }}" {% if issue_type == 'Bug' %}selected{% endif %}>{{ issue_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <label for="title">Summary</label>
         <input id="title" type="text" name="title" maxlength="150" required>
 
         <label for="description">Description</label>
@@ -33,6 +52,33 @@
 
         <div class="two-column">
             <div>
+                <label for="parent_id">Parent Issue</label>
+                <select id="parent_id" name="parent_id">
+                    <option value="">No parent</option>
+                    {% for parent in parents %}
+                        <option value="{{ parent.id }}">{{ parent.issue_key }} · {{ parent.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="labels">Labels</label>
+                <input id="labels" type="text" name="labels" maxlength="255" placeholder="frontend, customer-impact">
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div>
+                <label for="story_points">Story Points</label>
+                <input id="story_points" type="number" name="story_points" min="1" max="100">
+            </div>
+            <div>
+                <label for="due_date">Due Date</label>
+                <input id="due_date" type="date" name="due_date">
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div>
                 <label for="priority">Priority</label>
                 <select id="priority" name="priority" required>
                     {% for priority in priorities %}
@@ -53,7 +99,7 @@
         <label for="screenshot">Screenshot</label>
         <input id="screenshot" type="file" name="screenshot" accept="image/png,image/jpeg,image/gif,image/webp">
 
-        <button type="submit">Submit Bug</button>
+        <button type="submit">Create Issue</button>
     </form>
 </section>
 {% endblock %}

@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-The Software Bug Tracking and Reporting Tool is a web-based application developed to support software defect management. The system allows users to report bugs, assign them to developers, track their progress, add comments, and generate reports. It is designed for teams that need a simple localhost-based tool for managing software defects during development and maintenance.
+The Software Bug Tracking and Reporting Tool is a web-based application for software defect and work management. It supports project-scoped issues, assignment, a Kanban workflow, Jira-style work types and parent relationships, comments, watchers, and reports.
 
 The application uses Python Flask for backend development, MySQL for database storage, and HTML, CSS, and JavaScript for the frontend interface.
 
@@ -92,11 +92,15 @@ Fields:
 
 ### bugs table
 
-Stores bug report details.
+Stores issue details, including project membership and Jira-style planning metadata.
 
 Fields:
 
 - `id`
+- `project_id`
+- `issue_key`
+- `issue_type`
+- `parent_id`
 - `title`
 - `description`
 - `reproduction_steps`
@@ -108,6 +112,17 @@ Fields:
 - `screenshot_path`
 - `created_at`
 - `updated_at`
+- `labels`
+- `story_points`
+- `due_date`
+
+### projects table
+
+Stores organization-scoped projects, short keys, descriptions, and issue-number counters.
+
+### issue_watchers table
+
+Stores users who watch an issue for updates.
 
 ### comments table
 
@@ -163,6 +178,10 @@ Handles report filters and CSV export.
 
 Handles admin user management and role updates.
 
+### routes/project_routes.py
+
+Handles project creation, project listing, filtering, and the Kanban board.
+
 ### utils/decorators.py
 
 Provides `login_required` and `role_required` decorators to protect routes.
@@ -173,7 +192,7 @@ Provides `login_required` and `role_required` decorators to protect routes.
 | --- | --- | --- | --- | --- |
 | Register/Login | Yes | Yes | Yes | Yes |
 | View Dashboard | Yes | Yes | Yes | Yes |
-| Report Bug | Yes | Yes | No | Yes |
+| Create Issue | Yes | Yes | Yes | Yes |
 | View Bugs | Yes | Yes | Yes | Yes |
 | Assign Bug | Yes | Yes | No | No |
 | Update Bug Status | No | No | Assigned developer only | No |
@@ -255,12 +274,11 @@ The following tests should be performed:
 
 ## 14. Conclusion
 
-The Software Bug Tracking and Reporting Tool meets the main objectives of the project. It provides a complete workflow for reporting, assigning, monitoring, commenting on, and resolving software bugs. The system also includes dashboard statistics, filtering, reporting, CSV export, screenshot uploads, audit history, admin user management, tenant isolation, CSRF protection, secure headers, pooled database connections, and a production-style WSGI entry point. It is suitable as a localhost academic or client demonstration project and now has a stronger foundation for future deployment.
+The system now provides a focused Jira-style workflow with projects, issue keys, multiple work types, parent-child relationships, Kanban tracking, labels, estimates, due dates, watchers, assignment, comments, reports, and audit history while retaining tenant isolation and role-based security.
 
 ## 15. Future Enhancements
 
-- Add email notifications.
-- Add pagination.
 - Add richer email templates.
+- Add sprint planning and backlog ranking.
 - Add direct GitHub API synchronization.
 - Add production deployment support with HTTPS and managed secrets.

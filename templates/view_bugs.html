@@ -1,20 +1,30 @@
 {% extends "base.html" %}
 
-{% block title %}Bugs - Bug Tracking Tool{% endblock %}
+{% block title %}Issues - Bug Tracking Tool{% endblock %}
 
 {% block content %}
 <div class="page-heading">
     <div>
         <p class="eyebrow">Tracking</p>
-        <h1>Reported Bugs</h1>
+        <h1>Issues</h1>
     </div>
-    {% if current_user_role in ['tester', 'admin', 'project_manager'] %}
-        <a class="button" href="{{ url_for('bug.add_bug') }}">Report Bug</a>
-    {% endif %}
+    <a class="button" href="{{ url_for('bug.add_bug') }}">Create Issue</a>
 </div>
 
 <form method="GET" class="filter-box">
-    <input type="search" name="q" placeholder="Search title or description" value="{{ filters.get('q', '') }}">
+    <input type="search" name="q" placeholder="Search key, summary or description" value="{{ filters.get('q', '') }}">
+    <select name="project">
+        <option value="">All Projects</option>
+        {% for project in projects %}
+            <option value="{{ project.id }}" {% if filters.get('project') == project.id|string %}selected{% endif %}>{{ project.project_key }}</option>
+        {% endfor %}
+    </select>
+    <select name="issue_type">
+        <option value="">All Types</option>
+        {% for issue_type in issue_types %}
+            <option value="{{ issue_type }}" {% if filters.get('issue_type') == issue_type %}selected{% endif %}>{{ issue_type }}</option>
+        {% endfor %}
+    </select>
     <select name="status">
         <option value="">All Status</option>
         {% for status in statuses %}
@@ -47,32 +57,30 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Title</th>
+                    <th>Key</th>
+                    <th>Type</th>
+                    <th>Summary</th>
                     <th>Priority</th>
-                    <th>Severity</th>
                     <th>Status</th>
-                    <th>Reporter</th>
                     <th>Assigned</th>
-                    <th>Created</th>
+                    <th>Due</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for bug in bugs %}
                     <tr>
-                        <td>#{{ bug.id }}</td>
+                        <td><strong>{{ bug.issue_key }}</strong></td>
+                        <td>{{ bug.issue_type }}</td>
                         <td>{{ bug.title }}</td>
                         <td><span class="badge">{{ bug.priority }}</span></td>
-                        <td><span class="badge severity">{{ bug.severity }}</span></td>
                         <td><span class="status">{{ bug.status }}</span></td>
-                        <td>{{ bug.reporter_name }}</td>
                         <td>{{ bug.developer_name or "Not Assigned" }}</td>
-                        <td>{{ bug.created_at }}</td>
+                        <td>{{ bug.due_date or "—" }}</td>
                         <td><a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">View</a></td>
                     </tr>
                 {% else %}
-                    <tr><td colspan="9" class="empty">No bugs match the selected filters.</td></tr>
+                    <tr><td colspan="8" class="empty">No issues match the selected filters.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -83,7 +91,7 @@
         {% if pagination.has_previous %}
             <a href="{{ url_for('bug.view_bugs', page=pagination.page - 1, **page_args) }}">Previous</a>
         {% endif %}
-        <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} bugs</span>
+        <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} issues</span>
         {% if pagination.has_next %}
             <a href="{{ url_for('bug.view_bugs', page=pagination.page + 1, **page_args) }}">Next</a>
         {% endif %}

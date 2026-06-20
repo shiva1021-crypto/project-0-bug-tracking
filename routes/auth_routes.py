@@ -1,3 +1,5 @@
+import re
+
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -31,6 +33,16 @@ def register():
 
                 cursor.execute("INSERT INTO organizations (name) VALUES (%s)", (organization_name,))
                 organization_id = cursor.lastrowid
+                project_key = re.sub(r"[^A-Za-z0-9]", "", organization_name).upper()[:10]
+                if len(project_key) < 2:
+                    project_key = f"ORG{organization_id}"
+                cursor.execute(
+                    """
+                    INSERT INTO projects (organization_id, name, project_key, description)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (organization_id, "General", project_key, "Default project"),
+                )
                 cursor.execute(
                     """
                     INSERT INTO users (organization_id, full_name, email, password_hash, role)

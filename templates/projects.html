@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Projects - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">Jira-style organization</p>
+        <h1>Projects</h1>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('project.board') }}">Open Board</a>
+</div>
+
+{% if current_user_role in ['admin', 'project_manager'] %}
+<section class="panel project-create">
+    <h2>Create Project</h2>
+    <form method="POST" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <div class="two-column">
+            <div>
+                <label for="name">Project Name</label>
+                <input id="name" name="name" maxlength="120" required>
+            </div>
+            <div>
+                <label for="project_key">Project Key</label>
+                <input id="project_key" name="project_key" minlength="2" maxlength="10" pattern="[A-Za-z][A-Za-z0-9]+" placeholder="WEB" required>
+            </div>
+        </div>
+        <label for="description">Description</label>
+        <textarea id="description" name="description"></textarea>
+        <button type="submit">Create Project</button>
+    </form>
+</section>
+{% endif %}
+
+<section class="project-grid">
+    {% for project in projects %}
+        <article class="panel project-card">
+            <span class="project-key">{{ project.project_key }}</span>
+            <h2>{{ project.name }}</h2>
+            <p>{{ project.description or "No description." }}</p>
+            <div class="project-card-footer">
+                <span>{{ project.issue_count }} issues</span>
+                <a href="{{ url_for('project.board', project=project.id) }}">View Board</a>
+            </div>
+        </article>
+    {% else %}
+        <p class="empty">No projects yet.</p>
+    {% endfor %}
+</section>
+{% endblock %}

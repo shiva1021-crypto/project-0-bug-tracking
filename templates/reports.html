@@ -6,7 +6,7 @@
 <div class="page-heading">
     <div>
         <p class="eyebrow">Reporting</p>
-        <h1>Bug Reports</h1>
+        <h1>Issue Reports</h1>
     </div>
     <div class="action-row">
         <button class="button button-secondary print-report" type="button">Export PDF</button>
@@ -75,6 +75,18 @@
 </section>
 
 <form method="GET" class="filter-box report-filter">
+    <select name="project">
+        <option value="">All Projects</option>
+        {% for project in projects %}
+            <option value="{{ project.id }}" {% if filters.get('project') == project.id|string %}selected{% endif %}>{{ project.project_key }}</option>
+        {% endfor %}
+    </select>
+    <select name="issue_type">
+        <option value="">All Types</option>
+        {% for issue_type in issue_types %}
+            <option value="{{ issue_type }}" {% if filters.get('issue_type') == issue_type %}selected{% endif %}>{{ issue_type }}</option>
+        {% endfor %}
+    </select>
     <select name="status">
         <option value="">All Status</option>
         {% for status in statuses %}
@@ -103,29 +115,29 @@
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Bug</th>
-                    <th>Category</th>
+                    <th>Key</th>
+                    <th>Type</th>
+                    <th>Issue</th>
+                    <th>Project</th>
                     <th>Status</th>
                     <th>Priority</th>
                     <th>Severity</th>
-                    <th>Reporter</th>
                     <th>Assigned</th>
-                    <th>Date</th>
+                    <th>Due</th>
                 </tr>
             </thead>
             <tbody>
                 {% for bug in bugs %}
                     <tr>
-                        <td>#{{ bug.id }}</td>
+                        <td><strong>{{ bug.issue_key }}</strong></td>
+                        <td>{{ bug.issue_type }}</td>
                         <td>{{ bug.title }}</td>
-                        <td>{{ bug.category }}</td>
+                        <td>{{ bug.project_name }}</td>
                         <td><span class="status">{{ bug.status }}</span></td>
                         <td>{{ bug.priority }}</td>
                         <td>{{ bug.severity }}</td>
-                        <td>{{ bug.reporter_name }}</td>
                         <td>{{ bug.developer_name or "Not Assigned" }}</td>
-                        <td>{{ bug.created_at }}</td>
+                        <td>{{ bug.due_date or "—" }}</td>
                     </tr>
                 {% else %}
                     <tr><td colspan="9" class="empty">No report rows match the selected filters.</td></tr>
@@ -139,7 +151,7 @@
         {% if pagination.has_previous %}
             <a href="{{ url_for('report.reports', page=pagination.page - 1, **page_args) }}">Previous</a>
         {% endif %}
-        <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} bugs</span>
+        <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} issues</span>
         {% if pagination.has_next %}
             <a href="{{ url_for('report.reports', page=pagination.page + 1, **page_args) }}">Next</a>
         {% endif %}

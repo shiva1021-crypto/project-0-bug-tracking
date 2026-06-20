@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Bug - Bug Tracking Tool{% endblock %}
+{% block title %}Edit {{ bug.issue_key }} - Bug Tracking Tool{% endblock %}
 
 {% block content %}
 <section class="form-card">
-    <h1>Edit Bug #{{ bug.id }}</h1>
+    <h1>Edit {{ bug.issue_key }}</h1>
     <form method="POST" enctype="multipart/form-data" novalidate>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <label for="title">Bug Title</label>
+        <label for="title">Summary</label>
         <input id="title" type="text" name="title" maxlength="150" value="{{ bug.title }}" required>
 
         <label for="description">Description</label>
@@ -15,6 +15,26 @@
 
         <label for="reproduction_steps">Reproduction Steps</label>
         <textarea id="reproduction_steps" name="reproduction_steps">{{ bug.reproduction_steps or "" }}</textarea>
+
+        <div class="two-column">
+            <div>
+                <label for="issue_type">Work Type</label>
+                <select id="issue_type" name="issue_type" required>
+                    {% for issue_type in issue_types %}
+                        <option value="{{ issue_type }}" {% if bug.issue_type == issue_type %}selected{% endif %}>{{ issue_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="parent_id">Parent Issue</label>
+                <select id="parent_id" name="parent_id">
+                    <option value="">No parent</option>
+                    {% for parent in parents %}
+                        <option value="{{ parent.id }}" {% if bug.parent_id == parent.id %}selected{% endif %}>{{ parent.issue_key }} · {{ parent.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
         <div class="two-column">
             <div>
@@ -30,6 +50,20 @@
                 <input id="external_issue_url" type="url" name="external_issue_url" value="{{ bug.external_issue_url or '' }}" placeholder="https://github.com/...">
             </div>
         </div>
+
+        <div class="two-column">
+            <div>
+                <label for="labels">Labels</label>
+                <input id="labels" type="text" name="labels" maxlength="255" value="{{ bug.labels or '' }}">
+            </div>
+            <div>
+                <label for="story_points">Story Points</label>
+                <input id="story_points" type="number" name="story_points" min="1" max="100" value="{{ bug.story_points or '' }}">
+            </div>
+        </div>
+
+        <label for="due_date">Due Date</label>
+        <input id="due_date" type="date" name="due_date" value="{{ bug.due_date or '' }}">
 
         <div class="two-column">
             <div>

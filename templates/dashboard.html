@@ -8,14 +8,12 @@
         <p class="eyebrow">Overview</p>
         <h1>Dashboard</h1>
     </div>
-    {% if current_user_role in ['tester', 'admin', 'project_manager'] %}
-        <a class="button" href="{{ url_for('bug.add_bug') }}">Report Bug</a>
-    {% endif %}
+    <a class="button" href="{{ url_for('bug.add_bug') }}">Create Issue</a>
 </div>
 
 <section class="stats-grid">
     <article class="stat-card">
-        <span>Total Bugs</span>
+        <span>Total Issues</span>
         <strong>{{ stats.total_bugs or 0 }}</strong>
     </article>
     <article class="stat-card">
@@ -38,14 +36,15 @@
 
 <section class="panel">
     <div class="section-heading">
-        <h2>Recent Bugs</h2>
+        <h2>Recent Issues</h2>
         <a href="{{ url_for('bug.view_bugs') }}">View all</a>
     </div>
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Key</th>
+                    <th>Type</th>
                     <th>Title</th>
                     <th>Priority</th>
                     <th>Severity</th>
@@ -57,7 +56,8 @@
             <tbody>
                 {% for bug in recent_bugs %}
                     <tr>
-                        <td>#{{ bug.id }}</td>
+                        <td><strong>{{ bug.issue_key }}</strong></td>
+                        <td>{{ bug.issue_type }}</td>
                         <td>{{ bug.title }}</td>
                         <td><span class="badge">{{ bug.priority }}</span></td>
                         <td><span class="badge severity">{{ bug.severity }}</span></td>
@@ -66,7 +66,7 @@
                         <td><a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">View</a></td>
                     </tr>
                 {% else %}
-                    <tr><td colspan="7" class="empty">No bugs reported yet.</td></tr>
+                    <tr><td colspan="8" class="empty">No issues created yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -7,6 +7,20 @@ CREATE TABLE IF NOT EXISTS organizations (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS projects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organization_id INT NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    project_key VARCHAR(10) NOT NULL,
+    description TEXT,
+    next_issue_number INT NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_projects_org_key (organization_id, project_key),
+    INDEX idx_projects_organization (organization_id),
+    CONSTRAINT fk_projects_organization
+        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organization_id INT NOT NULL,
@@ -23,6 +37,10 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS bugs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organization_id INT NOT NULL,
+    project_id INT NOT NULL,
+    issue_key VARCHAR(30) NOT NULL,
+    issue_type ENUM('Epic', 'Story', 'Task', 'Bug', 'Subtask') NOT NULL DEFAULT 'Bug',
+    parent_id INT NULL,
     title VARCHAR(150) NOT NULL,
     description TEXT NOT NULL,
     reproduction_steps TEXT,
@@ -34,6 +52,9 @@ CREATE TABLE IF NOT EXISTS bugs (
     assigned_to INT NULL,
     screenshot_path VARCHAR(255),
     external_issue_url VARCHAR(255),
+    labels VARCHAR(255),
+    story_points INT NULL,
+    due_date DATE NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_bugs_status (status),
@@ -42,12 +63,31 @@ CREATE TABLE IF NOT EXISTS bugs (
     INDEX idx_bugs_category (category),
     INDEX idx_bugs_assigned_to (assigned_to),
     INDEX idx_bugs_organization (organization_id),
+    UNIQUE KEY uq_bugs_org_issue_key (organization_id, issue_key),
+    INDEX idx_bugs_project (project_id),
+    INDEX idx_bugs_issue_type (issue_type),
+    INDEX idx_bugs_parent (parent_id),
     CONSTRAINT fk_bugs_organization
         FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bugs_project
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bugs_parent
+        FOREIGN KEY (parent_id) REFERENCES bugs(id) ON DELETE SET NULL,
     CONSTRAINT fk_bugs_reporter
         FOREIGN KEY (reporter_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_bugs_assigned
         FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS issue_watchers (
+    bug_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (bug_id, user_id),
+    CONSTRAINT fk_watchers_bug
+        FOREIGN KEY (bug_id) REFERENCES bugs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_watchers_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS comments (

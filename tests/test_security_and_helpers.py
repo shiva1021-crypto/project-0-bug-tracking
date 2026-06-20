@@ -9,7 +9,12 @@ from flask import Flask, session
 import config
 from app import app as application
 from models import bug_model
-from routes.bug_routes import detected_image_extension
+from routes.bug_routes import (
+    detected_image_extension,
+    normalized_labels,
+    parsed_due_date,
+    parsed_story_points,
+)
 from routes.report_routes import safe_csv_cell
 from utils.decorators import role_required
 from utils.pagination import pagination_values
@@ -93,6 +98,16 @@ class SecurityAndHelperTests(unittest.TestCase):
         self.assertEqual(detected_image_extension(png), "png")
         self.assertIsNone(detected_image_extension(fake))
 
+    def test_jira_style_issue_metadata_is_normalized(self):
+        self.assertEqual(
+            normalized_labels("Frontend, customer impact, frontend"),
+            "frontend,customer-impact",
+        )
+        self.assertEqual(parsed_story_points("8"), 8)
+        self.assertEqual(str(parsed_due_date("2026-07-15")), "2026-07-15")
+        with self.assertRaises(ValueError):
+            parsed_story_points("101")
+
     def test_production_rejects_missing_secret(self):
         with patch.dict(
             os.environ, {"APP_ENV": "production", "SECRET_KEY": ""}, clear=False
@@ -123,6 +138,18 @@ class SecurityAndHelperTests(unittest.TestCase):
         )
         self.assertIn("POST", logout_rule.methods)
         self.assertNotIn("GET", logout_rule.methods)
+
+    def test_jira_style_routes_are_registered(self):
+        endpoints = {rule.endpoint for rule in application.url_map.iter_rules()}
+        self.assertIn("project.projects", endpoints)
+        self.assertIn("project.board", endpoints)
+        self.assertIn("bug.toggle_watch", endpoints)
+
+    def test_premium_landing_page_renders(self):
+        response = application.test_client().get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Turn complex work into", response.data)
+        self.assertIn(b"Kanban board preview", response.data)
 
 
 if __name__ == "__main__":

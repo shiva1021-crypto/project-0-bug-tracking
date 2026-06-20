@@ -8,6 +8,7 @@ from routes.admin_routes import admin_bp
 from routes.auth_routes import auth_bp
 from routes.bug_routes import bug_bp
 from routes.report_routes import report_bp
+from routes.project_routes import project_bp
 from utils.decorators import login_required
 from utils.security import csrf_token, set_security_headers, validate_csrf
 
@@ -26,6 +27,7 @@ def create_app():
     app.register_blueprint(bug_bp)
     app.register_blueprint(report_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(project_bp)
 
     @app.context_processor
     def inject_user():

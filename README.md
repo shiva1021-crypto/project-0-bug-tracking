@@ -6,6 +6,17 @@ The Software Bug Tracking and Reporting Tool is a web-based application designed
 
 The application is developed using HTML, CSS, JavaScript, Python Flask, and MySQL. It includes authentication, dashboard statistics, comments, search and filtering, report generation, CSV export, PDF print export, screenshot uploads, charts, category analytics, audit history, tenant isolation, optional email notifications, external issue links, dark mode, CSRF protection, secure headers, pooled database connections, production-style WSGI support, and admin user management. The main purpose of the project is to improve defect management and make the software maintenance process more organized and efficient.
 
+## Jira-Style Work Management
+
+- Organization-scoped projects with short keys such as `WEB` or `API`.
+- Human-readable issue keys such as `WEB-1`.
+- Epic, Story, Task, Bug, and Subtask work types.
+- Parent and child issue relationships.
+- Kanban columns for Open, In Progress, Resolved, and Closed.
+- Story points, labels, due dates, assignment, and audit history.
+- Issue watching with status-update notifications.
+- Project and work-type filters in issue lists and reports.
+
 ## Objectives
 
 ### Essential Objectives
@@ -94,6 +105,7 @@ project 0/
 |   |-- auth_routes.py
 |   |-- bug_routes.py
 |   |-- report_routes.py
+|   |-- project_routes.py
 |
 |-- static/
 |   |-- css/
@@ -112,6 +124,8 @@ project 0/
 |   |-- edit_bug.html
 |   |-- bug_details.html
 |   |-- reports.html
+|   |-- projects.html
+|   |-- board.html
 |   |-- users.html
 |   |-- database_error.html
 |
@@ -141,6 +155,10 @@ Stores reported bug information.
 Main fields:
 
 - `id`
+- `project_id`
+- `issue_key`
+- `issue_type`
+- `parent_id`
 - `title`
 - `description`
 - `reproduction_steps`
@@ -152,6 +170,17 @@ Main fields:
 - `screenshot_path`
 - `created_at`
 - `updated_at`
+- `labels`
+- `story_points`
+- `due_date`
+
+### projects
+
+Stores organization-scoped projects, project keys, and issue-number counters.
+
+### issue_watchers
+
+Stores users who watch an issue for updates.
 
 ### comments
 
@@ -197,7 +226,7 @@ Main fields:
 | --- | --- | --- | --- | --- |
 | Register/Login | Yes | Yes | Yes | Yes |
 | View Dashboard | Yes | Yes | Yes | Yes |
-| Report Bug | Yes | Yes | No | Yes |
+| Create Issue | Yes | Yes | Yes | Yes |
 | View Bugs | Yes | Yes | Yes | Yes |
 | Assign Bug | Yes | Yes | No | No |
 | Update Bug Status | No | No | Assigned developer only | No |
@@ -380,6 +409,8 @@ SELECT * FROM bug_history;
 | `/profile` | Logged-in user's profile |
 | `/profile/<id>` | View a user's profile and bug activity |
 | `/dashboard` | Dashboard statistics |
+| `/board` | Kanban board |
+| `/projects` | Project management |
 | `/bugs` | View, search, and filter bugs |
 | `/bugs/add` | Report a new bug |
 | `/bugs/<id>` | View bug details |

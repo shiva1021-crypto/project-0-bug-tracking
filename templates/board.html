@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Kanban Board - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">Delivery workflow</p>
+        <h1>Kanban Board</h1>
+    </div>
+    <a class="button" href="{{ url_for('bug.add_bug') }}">Create Issue</a>
+</div>
+
+<form method="GET" class="filter-box board-filter">
+    <select name="project" aria-label="Filter board by project">
+        <option value="">All Projects</option>
+        {% for project in projects %}
+            <option value="{{ project.id }}" {% if selected_project == project.id|string %}selected{% endif %}>{{ project.project_key }} · {{ project.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Apply</button>
+</form>
+
+<section class="kanban-board">
+    {% for status, issues in columns.items() %}
+        <div class="kanban-column">
+            <div class="kanban-column-heading">
+                <h2>{{ status }}</h2>
+                <span>{{ issues|length }}</span>
+            </div>
+            <div class="kanban-cards">
+                {% for issue in issues %}
+                    <article class="kanban-card">
+                        <div class="kanban-card-meta">
+                            <span>{{ issue.issue_type }}</span>
+                            <strong>{{ issue.issue_key }}</strong>
+                        </div>
+                        <a class="kanban-card-title" href="{{ url_for('bug.bug_details', bug_id=issue.id) }}">{{ issue.title }}</a>
+                        <div class="label-row">
+                            {% for label in issue.label_list %}<span class="issue-label">{{ label }}</span>{% endfor %}
+                        </div>
+                        <div class="kanban-card-footer">
+                            <span>{{ issue.priority }}</span>
+                            <span>{{ issue.story_points or '–' }} pts</span>
+                            <span>{{ issue.assignee_name or 'Unassigned' }}</span>
+                        </div>
+                        {% if current_user_role == 'developer' and issue.assigned_to == current_user_id %}
+                            <form method="POST" action="{{ url_for('bug.update_status', bug_id=issue.id) }}">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="return_to" value="board">
+                                <input type="hidden" name="project" value="{{ selected_project }}">
+                                <select name="status" aria-label="Update {{ issue.issue_key }} status">
+                                    {% for option in statuses %}
+                                        <option value="{{ option }}" {% if issue.status == option %}selected{% endif %}>{{ option }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit">Move</button>
+                            </form>
+                        {% endif %}
+                    </article>
+                {% else %}
+                    <p class="empty">No issues</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

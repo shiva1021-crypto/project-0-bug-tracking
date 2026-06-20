@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 
 import mysql.connector
@@ -39,19 +40,27 @@ def run_if_needed(cursor, statement):
 
 def run_migrations(cursor):
     cursor.execute(f"USE {os.getenv('DB_NAME', 'bug_tracking_db')}")
-    cursor.execute(
-        "INSERT IGNORE INTO organizations (name) VALUES (%s)",
-        (DEFAULT_ORG_NAME,),
-    )
-    cursor.execute("SELECT id FROM organizations WHERE name = %s", (DEFAULT_ORG_NAME,))
-    default_org_id = cursor.fetchone()[0]
+    default_org_id = None
 
     if not column_exists(cursor, "users", "organization_id"):
+        cursor.execute(
+            "INSERT IGNORE INTO organizations (name) VALUES (%s)",
+            (DEFAULT_ORG_NAME,),
+        )
+        cursor.execute("SELECT id FROM organizations WHERE name = %s", (DEFAULT_ORG_NAME,))
+        default_org_id = cursor.fetchone()[0]
         cursor.execute("ALTER TABLE users ADD COLUMN organization_id INT NULL AFTER id")
         cursor.execute("UPDATE users SET organization_id = %s WHERE organization_id IS NULL", (default_org_id,))
         cursor.execute("ALTER TABLE users MODIFY organization_id INT NOT NULL")
 
     if not column_exists(cursor, "bugs", "organization_id"):
+        if default_org_id is None:
+            cursor.execute(
+                "INSERT IGNORE INTO organizations (name) VALUES (%s)",
+                (DEFAULT_ORG_NAME,),
+            )
+            cursor.execute("SELECT id FROM organizations WHERE name = %s", (DEFAULT_ORG_NAME,))
+            default_org_id = cursor.fetchone()[0]
         cursor.execute("ALTER TABLE bugs ADD COLUMN organization_id INT NULL AFTER id")
         cursor.execute(
             """
@@ -70,15 +79,100 @@ def run_migrations(cursor):
     if not column_exists(cursor, "bugs", "external_issue_url"):
         cursor.execute("ALTER TABLE bugs ADD COLUMN external_issue_url VARCHAR(255) NULL AFTER screenshot_path")
 
+    if not column_exists(cursor, "bugs", "project_id"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN project_id INT NULL AFTER organization_id")
+    if not column_exists(cursor, "bugs", "issue_key"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN issue_key VARCHAR(30) NULL AFTER project_id")
+    if not column_exists(cursor, "bugs", "issue_type"):
+        cursor.execute(
+            "ALTER TABLE bugs ADD COLUMN issue_type "
+            "ENUM('Epic', 'Story', 'Task', 'Bug', 'Subtask') NOT NULL DEFAULT 'Bug' "
+            "AFTER issue_key"
+        )
+    if not column_exists(cursor, "bugs", "parent_id"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN parent_id INT NULL AFTER issue_type")
+    if not column_exists(cursor, "bugs", "labels"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN labels VARCHAR(255) NULL AFTER external_issue_url")
+    if not column_exists(cursor, "bugs", "story_points"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN story_points INT NULL AFTER labels")
+    if not column_exists(cursor, "bugs", "due_date"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN due_date DATE NULL AFTER story_points")
+
+    cursor.execute("SELECT id, name FROM organizations ORDER BY id")
+    organizations = cursor.fetchall()
+    projects_by_org = {}
+    for organization_id, organization_name in organizations:
+        cursor.execute(
+            "SELECT id, project_key FROM projects WHERE organization_id = %s ORDER BY id LIMIT 1",
+            (organization_id,),
+        )
+        project = cursor.fetchone()
+        if not project:
+            project_key = re.sub(r"[^A-Za-z0-9]", "", organization_name).upper()[:6] or f"ORG{organization_id}"
+            cursor.execute(
+                """
+                INSERT INTO projects (organization_id, name, project_key, description)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (organization_id, "General", project_key, "Default project"),
+            )
+            project = (cursor.lastrowid, project_key)
+        projects_by_org[organization_id] = project
+
+    cursor.execute(
+        "SELECT id, organization_id FROM bugs WHERE project_id IS NULL OR issue_key IS NULL ORDER BY id"
+    )
+    migrated_counts = {}
+    for bug_id, organization_id in cursor.fetchall():
+        project_id, project_key = projects_by_org[organization_id]
+        migrated_counts[project_id] = migrated_counts.get(project_id, 0) + 1
+        issue_number = migrated_counts[project_id]
+        cursor.execute(
+            "UPDATE bugs SET project_id = %s, issue_key = %s WHERE id = %s",
+            (project_id, f"{project_key}-{issue_number}", bug_id),
+        )
+
+    for project_id, count in migrated_counts.items():
+        cursor.execute(
+            "UPDATE projects SET next_issue_number = GREATEST(next_issue_number, %s) WHERE id = %s",
+            (count + 1, project_id),
+        )
+
+    cursor.execute("ALTER TABLE bugs MODIFY project_id INT NOT NULL")
+    cursor.execute("ALTER TABLE bugs MODIFY issue_key VARCHAR(30) NOT NULL")
+
     run_if_needed(cursor, "CREATE INDEX idx_users_organization ON users (organization_id)")
     run_if_needed(cursor, "CREATE INDEX idx_bugs_organization ON bugs (organization_id)")
     run_if_needed(cursor, "CREATE INDEX idx_bugs_category ON bugs (category)")
+    run_if_needed(cursor, "CREATE INDEX idx_bugs_project ON bugs (project_id)")
+    run_if_needed(cursor, "CREATE INDEX idx_bugs_issue_type ON bugs (issue_type)")
+    run_if_needed(cursor, "CREATE INDEX idx_bugs_parent ON bugs (parent_id)")
+    run_if_needed(
+        cursor,
+        "CREATE UNIQUE INDEX uq_bugs_org_issue_key ON bugs (organization_id, issue_key)",
+    )
     run_if_needed(
         cursor,
         """
         ALTER TABLE users
         ADD CONSTRAINT fk_users_organization
         FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+        """,
+    )
+    run_if_needed(
+        cursor,
+        """
+        ALTER TABLE bugs
+        ADD CONSTRAINT fk_bugs_project
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+        """,
+    )
+    run_if_needed(
+        cursor,
+        """
+        ALTER TABLE bugs
+        ADD CONSTRAINT fk_bugs_parent
+        FOREIGN KEY (parent_id) REFERENCES bugs(id) ON DELETE SET NULL
         """,
     )
     run_if_needed(
