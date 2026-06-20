@@ -1,6 +1,6 @@
 import hashlib
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from mysql.connector import Error
@@ -76,7 +76,7 @@ def register():
                     verified_at = None
                 else:
                     verification_token_hash = None
-                    verified_at = datetime.utcnow()
+                    verified_at = datetime.now(timezone.utc).replace(tzinfo=None)
 
                 cursor.execute(
                     """

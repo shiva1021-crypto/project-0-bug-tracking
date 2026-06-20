@@ -116,6 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let sourceColumn = null;
 
         cards.forEach(card => {
+            if (card.getAttribute("data-can-move") !== "true") return;
             card.setAttribute("draggable", "true");
 
             card.addEventListener("dragstart", function (e) {
@@ -183,18 +184,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         "X-Requested-With": "XMLHttpRequest"
                     }
                 })
-                .then(response => {
-                    if (response.ok) {
-                        Toast.show(`Successfully moved ${issueKey} to ${newStatus}`, "success");
-                    } else {
-                        throw new Error("Unauthorized status update");
+                .then(async response => {
+                    const payload = await response.json().catch(() => ({}));
+                    if (!response.ok || response.redirected || payload.ok !== true) {
+                        throw new Error(payload.error || "Status update was rejected");
                     }
+                    Toast.show(payload.message || `Successfully moved ${issueKey} to ${newStatus}`, "success");
                 })
                 .catch(error => {
                     // Revert visual elements
                     sourceColumn.querySelector(".kanban-cards").appendChild(draggedCard);
                     updateColumnCardCounts();
-                    Toast.show(`Failed to move ${issueKey}: Insufficient permission.`, "error");
+                    Toast.show(error.message || `Failed to move ${issueKey}.`, "error");
                 });
             });
         });
@@ -266,6 +267,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    const boardProjectFilter = document.querySelector(".board-filter-select");
+    if (boardProjectFilter) {
+        boardProjectFilter.addEventListener("change", function () {
+            boardProjectFilter.form.requestSubmit();
+        });
+    }
+
     // 6. AJAX details view interactions (Comments, Watchers, Assignment)
     const commentForm = document.querySelector(".ajax-comment-form");
     const watcherForm = document.querySelector(".ajax-watch-form");
@@ -287,8 +295,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(res => {
-                if (res.ok) {
+            .then(async res => {
+                const payload = await res.json().catch(() => ({}));
+                if (res.ok && !res.redirected && payload.ok === true) {
                     // Prepend new comment element to feed
                     const commentFeed = document.querySelector(".comment-box") ? document.querySelector(".comment-box").parentNode : null;
                     if (commentFeed) {
@@ -328,13 +337,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                     
                     textarea.value = "";
-                    Toast.show("Comment posted successfully.", "success");
+                    Toast.show(payload.message || "Comment posted successfully.", "success");
                 } else {
-                    throw new Error();
+                    throw new Error(payload.error || "Comment was rejected");
                 }
             })
-            .catch(() => {
-                Toast.show("Failed to post comment. Please try again.", "error");
+            .catch(error => {
+                Toast.show(error.message || "Failed to post comment. Please try again.", "error");
             });
         });
     }
@@ -356,8 +365,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(res => {
-                if (res.ok) {
+            .then(async res => {
+                const payload = await res.json().catch(() => ({}));
+                if (res.ok && !res.redirected && payload.ok === true) {
                     if (isUnwatching) {
                         actionInput.value = "watch";
                         submitBtn.className = "button";
@@ -380,11 +390,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     }
                 } else {
-                    throw new Error();
+                    throw new Error(payload.error || "Watcher update was rejected");
                 }
             })
-            .catch(() => {
-                Toast.show("Failed to update watching status.", "error");
+            .catch(error => {
+                Toast.show(error.message || "Failed to update watching status.", "error");
             });
         });
     }
@@ -414,8 +424,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
                 headers: { "X-Requested-With": "XMLHttpRequest" }
             })
-            .then(res => {
-                if (res.ok) {
+            .then(async res => {
+                const payload = await res.json().catch(() => ({}));
+                if (res.ok && !res.redirected && payload.ok === true) {
                     // Update assignee detail bubble in sidebar
                     const detailAssigneeSpan = document.querySelector(".detail-stat-item .detail-stat-value");
                     if (detailAssigneeSpan) {
@@ -435,11 +446,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                     Toast.show(`Assignment updated to ${selectedVal ? selectedText : "Unassigned"}`, "success");
                 } else {
-                    throw new Error();
+                    throw new Error(payload.error || "Assignment was rejected");
                 }
             })
-            .catch(() => {
-                Toast.show("Failed to update assignment.", "error");
+            .catch(error => {
+                Toast.show(error.message || "Failed to update assignment.", "error");
             });
         }
     }

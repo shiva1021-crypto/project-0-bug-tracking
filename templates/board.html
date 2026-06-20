@@ -303,28 +303,19 @@
             <input type="text" class="board-search-input" placeholder="Search board">
         </div>
         
-        <!-- Member initials icons mockup -->
-        <div class="board-avatars-list">
-            <span class="board-avatar-circle" style="background: #FF5630;" title="Assignee 1">JD</span>
-            <span class="board-avatar-circle" style="background: #36B37E;" title="Assignee 2">SM</span>
-            <span class="board-avatar-circle" style="background: #FFAB00;" title="Assignee 3">TA</span>
-            <span class="board-avatar-circle" style="background: #00B8D9;" title="Assignee 4">EL</span>
-        </div>
-
         <!-- Project dropdown filter -->
         <form method="GET" class="board-filter-form" style="margin: 0; display: inline-block;">
-            <select name="project" aria-label="Filter board by project" class="board-filter-select" onchange="this.form.submit()">
+            <select name="project" aria-label="Filter board by project" class="board-filter-select">
                 <option value="">All Projects</option>
                 {% for project in projects %}
                     <option value="{{ project.id }}" {% if selected_project == project.id|string %}selected{% endif %}>{{ project.project_key }} · {{ project.name }}</option>
                 {% endfor %}
             </select>
+            <button class="button-secondary board-filter-submit" type="submit">Apply</button>
         </form>
     </div>
 
     <div class="board-controls-right">
-        <!-- Complete sprint button mockup -->
-        <button class="button board-btn-sprint">Complete sprint</button>
         <!-- Create Issue link button -->
         <a class="button btn-create-issue" href="{{ url_for('bug.add_bug') }}" style="text-decoration: none;">+ Create</a>
     </div>
@@ -341,7 +332,7 @@
             
             <div class="kanban-cards">
                 {% for issue in issues %}
-                    <article class="kanban-card" data-id="{{ issue.id }}" data-key="{{ issue.issue_key }}" data-update-url="{{ url_for('bug.update_status', bug_id=issue.id) }}">
+                    <article class="kanban-card" data-id="{{ issue.id }}" data-key="{{ issue.issue_key }}" data-update-url="{{ url_for('bug.update_status', bug_id=issue.id) }}" data-can-move="{{ 'true' if current_user_role == 'developer' and issue.assigned_to == current_user_id else 'false' }}">
                         <!-- Card Title -->
                         <a class="kanban-card-title" href="{{ url_for('bug.bug_details', bug_id=issue.id) }}">{{ issue.title }}</a>
                         

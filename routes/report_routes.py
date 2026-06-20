@@ -34,18 +34,8 @@ def with_percent(rows, label_key):
     ]
 
 
-def build_report_query(args):
-    query = """
-        SELECT bugs.id, bugs.issue_key, bugs.issue_type, bugs.title, bugs.category,
-               bugs.status, bugs.priority, bugs.severity, bugs.story_points, bugs.due_date,
-               bugs.created_at, reporter.full_name AS reporter_name,
-               developer.full_name AS developer_name, projects.name AS project_name
-        FROM bugs
-        JOIN projects ON bugs.project_id = projects.id
-        JOIN users AS reporter ON bugs.reporter_id = reporter.id
-        LEFT JOIN users AS developer ON bugs.assigned_to = developer.id
-        WHERE bugs.organization_id = %s
-    """
+def build_report_scope(args):
+    where = " WHERE bugs.organization_id = %s"
     params = [session["organization_id"]]
 
     status = args.get("status", "")
@@ -57,26 +47,42 @@ def build_report_query(args):
     issue_type = args.get("issue_type", "")
 
     if status in STATUSES:
-        query += " AND bugs.status = %s"
+        where += " AND bugs.status = %s"
         params.append(status)
     if priority in PRIORITIES:
-        query += " AND bugs.priority = %s"
+        where += " AND bugs.priority = %s"
         params.append(priority)
     if severity in SEVERITIES:
-        query += " AND bugs.severity = %s"
+        where += " AND bugs.severity = %s"
         params.append(severity)
     if start_date:
-        query += " AND DATE(bugs.created_at) >= %s"
+        where += " AND bugs.created_at >= %s"
         params.append(start_date)
     if end_date:
-        query += " AND DATE(bugs.created_at) <= %s"
+        where += " AND bugs.created_at < DATE_ADD(%s, INTERVAL 1 DAY)"
         params.append(end_date)
     if project_id.isdigit():
-        query += " AND bugs.project_id = %s"
+        where += " AND bugs.project_id = %s"
         params.append(int(project_id))
     if issue_type in ISSUE_TYPES:
-        query += " AND bugs.issue_type = %s"
+        where += " AND bugs.issue_type = %s"
         params.append(issue_type)
+
+    return where, params
+
+
+def build_report_query(args):
+    where, params = build_report_scope(args)
+    query = """
+        SELECT bugs.id, bugs.issue_key, bugs.issue_type, bugs.title, bugs.category,
+               bugs.status, bugs.priority, bugs.severity, bugs.story_points, bugs.due_date,
+               bugs.created_at, reporter.full_name AS reporter_name,
+               developer.full_name AS developer_name, projects.name AS project_name
+        FROM bugs
+        JOIN projects ON bugs.project_id = projects.id
+        JOIN users AS reporter ON bugs.reporter_id = reporter.id
+        LEFT JOIN users AS developer ON bugs.assigned_to = developer.id
+    """ + where
 
     query += " ORDER BY bugs.created_at DESC"
     return query, params
@@ -86,6 +92,7 @@ def build_report_query(args):
 @role_required("admin", "project_manager")
 def reports():
     query, params = build_report_query(request.args)
+    report_scope, report_scope_params = build_report_scope(request.args)
     export_args = request.args.to_dict(flat=True)
     export_args.pop("page", None)
     export_args["export"] = "csv"
@@ -108,18 +115,19 @@ def reports():
     bugs = cursor.fetchall()
 
     cursor.execute(
-        "SELECT status, COUNT(*) AS total FROM bugs WHERE organization_id = %s GROUP BY status",
-        (session["organization_id"],),
+        f"SELECT status, COUNT(*) AS total FROM bugs {report_scope} GROUP BY status",
+        report_scope_params,
     )
     status_counts = cursor.fetchall()
     cursor.execute(
-        "SELECT priority, COUNT(*) AS total FROM bugs WHERE organization_id = %s GROUP BY priority",
-        (session["organization_id"],),
+        f"SELECT priority, COUNT(*) AS total FROM bugs {report_scope} GROUP BY priority",
+        report_scope_params,
     )
     priority_counts = cursor.fetchall()
     cursor.execute(
-        "SELECT category, COUNT(*) AS total FROM bugs WHERE organization_id = %s GROUP BY category ORDER BY total DESC LIMIT 8",
-        (session["organization_id"],),
+        f"SELECT category, COUNT(*) AS total FROM bugs {report_scope} "
+        "GROUP BY category ORDER BY total DESC LIMIT 8",
+        report_scope_params,
     )
     category_counts = cursor.fetchall()
     cursor.execute(

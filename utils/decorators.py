@@ -1,8 +1,9 @@
 from functools import wraps
 
-from flask import flash, redirect, session, url_for
+from flask import flash, jsonify, redirect, session, url_for
 
 from config import get_db_connection
+from utils.responses import is_ajax_request
 
 
 def has_valid_session():
@@ -45,6 +46,8 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         if not refresh_session_user():
             session.clear()
+            if is_ajax_request():
+                return jsonify(ok=False, error="Authentication required."), 401
             flash("Please login first.", "error")
             return redirect(url_for("auth.login"))
         return func(*args, **kwargs)
@@ -58,10 +61,14 @@ def role_required(*roles):
         def wrapper(*args, **kwargs):
             if not refresh_session_user():
                 session.clear()
+                if is_ajax_request():
+                    return jsonify(ok=False, error="Authentication required."), 401
                 flash("Please login first.", "error")
                 return redirect(url_for("auth.login"))
 
             if session.get("role") not in roles:
+                if is_ajax_request():
+                    return jsonify(ok=False, error="You do not have permission to perform this action."), 403
                 flash("You do not have permission to access this page.", "error")
                 return redirect(url_for("bug.dashboard"))
 

@@ -11,13 +11,21 @@ from routes import workflow_routes  # noqa: F401 - attaches workflow routes to b
 from routes.report_routes import report_bp
 from routes.project_routes import project_bp
 from utils.decorators import login_required
+from utils.notifications import start_notification_worker
 from utils.security import csrf_token, set_security_headers, validate_csrf
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+    if app.config["TRUST_PROXY_HEADERS"]:
+        app.wsgi_app = ProxyFix(
+            app.wsgi_app,
+            x_for=app.config["PROXY_FIX_X_FOR"],
+            x_proto=app.config["PROXY_FIX_X_PROTO"],
+            x_host=app.config["PROXY_FIX_X_HOST"],
+            x_prefix=app.config["PROXY_FIX_X_PREFIX"],
+        )
 
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
@@ -29,6 +37,13 @@ def create_app():
     app.register_blueprint(report_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(project_bp)
+
+    if (
+        app.config["NOTIFICATION_WORKER_ENABLED"]
+        and os.getenv("SMTP_HOST")
+        and os.getenv("SMTP_FROM")
+    ):
+        start_notification_worker()
 
     @app.context_processor
     def inject_user():

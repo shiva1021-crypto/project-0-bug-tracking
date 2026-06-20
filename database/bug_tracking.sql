@@ -56,6 +56,31 @@ CREATE TABLE IF NOT EXISTS registration_requests (
         FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS auth_rate_limits (
+    scope VARCHAR(50) NOT NULL,
+    identity_hash CHAR(64) NOT NULL,
+    window_started_at DATETIME NOT NULL,
+    attempts INT NOT NULL DEFAULT 1,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (scope, identity_hash),
+    INDEX idx_rate_limits_updated (updated_at)
+);
+
+CREATE TABLE IF NOT EXISTS email_outbox (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    recipient VARCHAR(255) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    body TEXT NOT NULL,
+    status ENUM('pending', 'processing', 'sent', 'failed') NOT NULL DEFAULT 'pending',
+    attempts INT NOT NULL DEFAULT 0,
+    next_attempt_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_error VARCHAR(500),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    sent_at DATETIME NULL,
+    INDEX idx_email_outbox_delivery (status, next_attempt_at)
+);
+
 CREATE TABLE IF NOT EXISTS bugs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organization_id INT NOT NULL,

@@ -12,6 +12,7 @@ from flask import (
     url_for,
 )
 from werkzeug.utils import secure_filename
+from PIL import Image, UnidentifiedImageError
 
 from config import get_db_connection
 from repositories.issue_repository import get_developers, get_projects
@@ -32,6 +33,8 @@ from routes.bug_blueprint import bug_bp
 from utils.decorators import can_update_bug_status, login_required, role_required
 from utils.pagination import pagination_values
 
+Image.MAX_IMAGE_PIXELS = 25_000_000
+
 
 def allowed_file(filename):
     return (
@@ -41,18 +44,16 @@ def allowed_file(filename):
 
 
 def detected_image_extension(file):
-    header = file.stream.read(12)
-    file.stream.seek(0)
-
-    if header.startswith(b"\x89PNG\r\n\x1a\n"):
-        return "png"
-    if header.startswith(b"\xff\xd8\xff"):
-        return "jpg"
-    if header.startswith((b"GIF87a", b"GIF89a")):
-        return "gif"
-    if len(header) >= 12 and header[:4] == b"RIFF" and header[8:12] == b"WEBP":
-        return "webp"
-    return None
+    try:
+        image = Image.open(file.stream)
+        image.verify()
+        return {"PNG": "png", "JPEG": "jpg", "GIF": "gif", "WEBP": "webp"}.get(
+            image.format
+        )
+    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, ValueError):
+        return None
+    finally:
+        file.stream.seek(0)
 
 
 def save_screenshot(file):
@@ -74,6 +75,15 @@ def save_screenshot(file):
     filename = f"{uuid4().hex}.{extension}"
     file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
     return filename
+
+
+def delete_screenshot(filename):
+    if not filename or os.path.basename(filename) != filename:
+        return
+    try:
+        os.remove(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+    except FileNotFoundError:
+        pass
 
 
 @bug_bp.route("/dashboard")
@@ -154,8 +164,6 @@ def add_bug():
             flash("Please fill all required bug fields with valid values.", "error")
             return redirect(url_for("bug.add_bug"))
 
-        screenshot_filename = save_screenshot(request.files.get("screenshot"))
-
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
@@ -188,51 +196,45 @@ def add_bug():
             flash(str(exc), "error")
             return redirect(url_for("bug.add_bug"))
 
-        issue_number = project["next_issue_number"]
-        issue_key = f"{project['project_key']}-{issue_number}"
-        cursor.execute(
-            "UPDATE projects SET next_issue_number = next_issue_number + 1 WHERE id = %s",
-            (project["id"],),
-        )
-        cursor.execute(
-            """
-            INSERT INTO bugs
-            (organization_id, project_id, issue_key, issue_type, parent_id,
-             title, description, reproduction_steps, category, priority, severity,
-             reporter_id, screenshot_path, external_issue_url, labels, story_points, due_date)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """,
-            (
-                session["organization_id"],
-                project["id"],
-                issue_key,
-                issue_type,
-                valid_parent_id,
-                title,
-                description,
-                reproduction_steps,
-                category,
-                priority,
-                severity,
-                session["user_id"],
-                screenshot_filename,
-                external_issue_url or None,
-                labels,
-                story_points,
-                due_date,
-            ),
-        )
-        bug_id = cursor.lastrowid
-        cursor.execute(
-            """
-            INSERT INTO bug_history (bug_id, changed_by, new_status, change_note)
-            VALUES (%s, %s, %s, %s)
-            """,
-            (bug_id, session["user_id"], "Open", f"{issue_type} {issue_key} created"),
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
+        screenshot_filename = save_screenshot(request.files.get("screenshot"))
+        try:
+            issue_number = project["next_issue_number"]
+            issue_key = f"{project['project_key']}-{issue_number}"
+            cursor.execute(
+                "UPDATE projects SET next_issue_number = next_issue_number + 1 WHERE id = %s",
+                (project["id"],),
+            )
+            cursor.execute(
+                """
+                INSERT INTO bugs
+                (organization_id, project_id, issue_key, issue_type, parent_id,
+                 title, description, reproduction_steps, category, priority, severity,
+                 reporter_id, screenshot_path, external_issue_url, labels, story_points, due_date)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    session["organization_id"], project["id"], issue_key, issue_type,
+                    valid_parent_id, title, description, reproduction_steps, category,
+                    priority, severity, session["user_id"], screenshot_filename,
+                    external_issue_url or None, labels, story_points, due_date,
+                ),
+            )
+            bug_id = cursor.lastrowid
+            cursor.execute(
+                """
+                INSERT INTO bug_history (bug_id, changed_by, new_status, change_note)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (bug_id, session["user_id"], "Open", f"{issue_type} {issue_key} created"),
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            delete_screenshot(screenshot_filename)
+            raise
+        finally:
+            cursor.close()
+            conn.close()
 
         flash(f"Issue {issue_key} created successfully.", "success")
         return redirect(url_for("bug.bug_details", bug_id=bug_id))
@@ -494,11 +496,6 @@ def edit_bug(bug_id):
             flash("Please provide valid bug details.", "error")
             return redirect(url_for("bug.edit_bug", bug_id=bug_id))
 
-        screenshot_filename = bug["screenshot_path"]
-        uploaded = save_screenshot(request.files.get("screenshot"))
-        if uploaded:
-            screenshot_filename = uploaded
-
         try:
             validate_children(cursor, bug_id, issue_type, session["organization_id"])
             valid_parent_id = resolve_parent(
@@ -515,44 +512,45 @@ def edit_bug(bug_id):
             flash(str(exc), "error")
             return redirect(url_for("bug.edit_bug", bug_id=bug_id))
 
-        cursor.execute(
-            """
-            UPDATE bugs
-            SET title = %s, description = %s, reproduction_steps = %s,
-                category = %s, priority = %s, severity = %s,
-                screenshot_path = %s, external_issue_url = %s,
-                issue_type = %s, parent_id = %s, labels = %s,
-                story_points = %s, due_date = %s
-            WHERE id = %s AND organization_id = %s
-            """,
-            (
-                title,
-                description,
-                reproduction_steps,
-                category,
-                priority,
-                severity,
-                screenshot_filename,
-                external_issue_url or None,
-                issue_type,
-                valid_parent_id,
-                labels,
-                story_points,
-                due_date,
-                bug_id,
-                session["organization_id"],
-            ),
-        )
-        cursor.execute(
-            """
-            INSERT INTO bug_history (bug_id, changed_by, change_note)
-            VALUES (%s, %s, %s)
-            """,
-            (bug_id, session["user_id"], "Bug details edited"),
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
+        uploaded = save_screenshot(request.files.get("screenshot"))
+        screenshot_filename = uploaded or bug["screenshot_path"]
+
+        try:
+            cursor.execute(
+                """
+                UPDATE bugs
+                SET title = %s, description = %s, reproduction_steps = %s,
+                    category = %s, priority = %s, severity = %s,
+                    screenshot_path = %s, external_issue_url = %s,
+                    issue_type = %s, parent_id = %s, labels = %s,
+                    story_points = %s, due_date = %s
+                WHERE id = %s AND organization_id = %s
+                """,
+                (
+                    title, description, reproduction_steps, category, priority, severity,
+                    screenshot_filename, external_issue_url or None, issue_type,
+                    valid_parent_id, labels, story_points, due_date, bug_id,
+                    session["organization_id"],
+                ),
+            )
+            cursor.execute(
+                """
+                INSERT INTO bug_history (bug_id, changed_by, change_note)
+                VALUES (%s, %s, %s)
+                """,
+                (bug_id, session["user_id"], "Bug details edited"),
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            delete_screenshot(uploaded)
+            raise
+        finally:
+            cursor.close()
+            conn.close()
+
+        if uploaded and bug["screenshot_path"] != uploaded:
+            delete_screenshot(bug["screenshot_path"])
 
         flash("Bug updated successfully.", "success")
         return redirect(url_for("bug.bug_details", bug_id=bug_id))

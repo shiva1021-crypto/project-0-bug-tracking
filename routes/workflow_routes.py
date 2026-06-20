@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, request, session, url_for
+from flask import abort, request, session
 
 from config import db_cursor, get_db_connection
 from repositories.workflow_repository import (
@@ -17,6 +17,7 @@ from routes.bug_blueprint import bug_bp
 from services.issue_service import STATUSES
 from utils.decorators import can_update_bug_status, login_required, role_required
 from utils.notifications import queue_email
+from utils.responses import action_response
 
 
 @bug_bp.route("/bugs/<int:bug_id>/assign", methods=["POST"])
@@ -42,8 +43,13 @@ def assign_bug(bug_id):
         if not developer:
             cursor.close()
             conn.close()
-            flash("Please select a developer from your organization.", "error")
-            return redirect(url_for("bug.bug_details", bug_id=bug_id))
+            return action_response(
+                "Please select a developer from your organization.",
+                "bug.bug_details",
+                status=400,
+                category="error",
+                bug_id=bug_id,
+            )
 
     save_assignment(
         cursor, bug_id, session["organization_id"], session["user_id"], old_assigned_to,
@@ -59,8 +65,7 @@ def assign_bug(bug_id):
             f"Issue assigned: {issue_key}",
             f"Hello {developer[2]},\n\n{issue_key} has been assigned to you.",
         )
-    flash("Issue assignment updated.", "success")
-    return redirect(url_for("bug.bug_details", bug_id=bug_id))
+    return action_response("Issue assignment updated.", "bug.bug_details", bug_id=bug_id)
 
 
 @bug_bp.route("/bugs/<int:bug_id>/status", methods=["POST"])
@@ -68,16 +73,23 @@ def assign_bug(bug_id):
 def update_status(bug_id):
     new_status = request.form.get("status", "")
     if new_status not in STATUSES:
-        flash("Please select a valid status.", "error")
-        return redirect(url_for("bug.bug_details", bug_id=bug_id))
+        return action_response(
+            "Please select a valid status.", "bug.bug_details",
+            status=400, category="error", bug_id=bug_id,
+        )
 
     with db_cursor(dictionary=True, commit=True) as cursor:
         bug = get_status_context(cursor, bug_id, session["organization_id"])
         if not bug:
             abort(404)
         if not can_update_bug_status(bug, session["user_id"], session.get("role")):
-            flash("Only the developer assigned to this issue can update its status.", "error")
-            return redirect(url_for("bug.bug_details", bug_id=bug_id))
+            return action_response(
+                "Only the developer assigned to this issue can update its status.",
+                "bug.bug_details",
+                status=403,
+                category="error",
+                bug_id=bug_id,
+            )
 
         old_status = bug["status"]
         save_status(
@@ -100,10 +112,14 @@ def update_status(bug_id):
             f"Watched issue updated: {reporter['issue_key']}",
             f"Hello {watcher['full_name']},\n\n{reporter['issue_key']} changed from {old_status} to {new_status}.",
         )
-    flash("Issue status updated successfully.", "success")
     if request.form.get("return_to") == "board":
-        return redirect(url_for("project.board", project=request.form.get("project", "")))
-    return redirect(url_for("bug.bug_details", bug_id=bug_id))
+        return action_response(
+            "Issue status updated successfully.", "project.board",
+            project=request.form.get("project", ""),
+        )
+    return action_response(
+        "Issue status updated successfully.", "bug.bug_details", bug_id=bug_id
+    )
 
 
 @bug_bp.route("/bugs/<int:bug_id>/comment", methods=["POST"])
@@ -111,15 +127,16 @@ def update_status(bug_id):
 def add_comment(bug_id):
     comment = request.form.get("comment", "").strip()
     if not comment:
-        flash("Comment cannot be empty.", "error")
-        return redirect(url_for("bug.bug_details", bug_id=bug_id))
+        return action_response(
+            "Comment cannot be empty.", "bug.bug_details",
+            status=400, category="error", bug_id=bug_id,
+        )
 
     with db_cursor(commit=True) as cursor:
         if not issue_exists(cursor, bug_id, session["organization_id"]):
             abort(404)
         save_comment(cursor, bug_id, session["user_id"], comment)
-    flash("Comment added.", "success")
-    return redirect(url_for("bug.bug_details", bug_id=bug_id))
+    return action_response("Comment added.", "bug.bug_details", bug_id=bug_id)
 
 
 @bug_bp.route("/bugs/<int:bug_id>/watch", methods=["POST"])
@@ -135,5 +152,4 @@ def toggle_watch(bug_id):
         else:
             set_watching(cursor, bug_id, session["user_id"], True)
             message = "You are now watching this issue."
-    flash(message, "success")
-    return redirect(url_for("bug.bug_details", bug_id=bug_id))
+    return action_response(message, "bug.bug_details", bug_id=bug_id)

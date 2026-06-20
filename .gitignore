@@ -2,6 +2,7 @@ venv/
 __pycache__/
 *.pyc
 .env
+.dev_secret_key
 flask.*.log
 uploads/bug_screenshots/*
 !uploads/bug_screenshots/.gitkeep

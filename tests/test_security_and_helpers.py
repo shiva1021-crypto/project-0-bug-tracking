@@ -1,10 +1,14 @@
 import io
 import os
+import tempfile
 import unittest
+from contextlib import contextmanager
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from flask import Flask, session
+from PIL import Image
 
 import config
 import seed_demo_data
@@ -18,7 +22,7 @@ from services.issue_service import (
     parsed_story_points,
     resolve_parent,
 )
-from routes.report_routes import safe_csv_cell
+from routes.report_routes import build_report_scope, safe_csv_cell
 from utils.decorators import role_required
 from utils.pagination import pagination_values
 from utils import rate_limit
@@ -106,8 +110,31 @@ class SecurityAndHelperTests(unittest.TestCase):
                 self.assertTrue(safe_csv_cell(value).startswith("'"))
         self.assertEqual(safe_csv_cell("Normal title"), "Normal title")
 
+    def test_report_scope_applies_filters_to_aggregates(self):
+        app = Flask(__name__)
+        app.secret_key = "test-secret"
+        with app.test_request_context("/reports"):
+            session["organization_id"] = 9
+            where, params = build_report_scope(
+                {
+                    "status": "Open",
+                    "priority": "High",
+                    "project": "4",
+                    "start_date": "2026-01-01",
+                    "end_date": "2026-01-31",
+                }
+            )
+        self.assertIn("bugs.status = %s", where)
+        self.assertIn("bugs.priority = %s", where)
+        self.assertIn("bugs.project_id = %s", where)
+        self.assertIn("DATE_ADD", where)
+        self.assertEqual(params, [9, "Open", "High", "2026-01-01", "2026-01-31", 4])
+
     def test_real_image_signature_is_detected(self):
-        png = SimpleNamespace(stream=io.BytesIO(b"\x89PNG\r\n\x1a\nrest"))
+        image_bytes = io.BytesIO()
+        Image.new("RGB", (2, 2), color="red").save(image_bytes, format="PNG")
+        image_bytes.seek(0)
+        png = SimpleNamespace(stream=image_bytes)
         fake = SimpleNamespace(stream=io.BytesIO(b"not an image"))
         self.assertEqual(detected_image_extension(png), "png")
         self.assertIsNone(detected_image_extension(fake))
@@ -128,6 +155,23 @@ class SecurityAndHelperTests(unittest.TestCase):
         ):
             with self.assertRaises(RuntimeError):
                 config._secret_key()
+
+    def test_development_keeps_configured_secret_across_reloads(self):
+        configured = "stable-development-key"
+        with patch.dict(
+            os.environ,
+            {"APP_ENV": "development", "SECRET_KEY": configured},
+            clear=False,
+        ):
+            self.assertEqual(config._secret_key(), configured)
+
+    def test_development_secret_is_persisted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(config, "BASE_DIR", Path(directory)):
+                first = config._development_secret()
+                second = config._development_secret()
+        self.assertGreaterEqual(len(first), 32)
+        self.assertEqual(first, second)
 
     def test_bug_model_scopes_query_to_organization(self):
         cursor = FakeCursor({"id": 5})
@@ -178,16 +222,22 @@ class SecurityAndHelperTests(unittest.TestCase):
     def test_registration_rate_limit_rejects_excess_attempts(self):
         rate_limit._events.clear()
         app = Flask(__name__)
-        app.config["TESTING"] = False
+        app.config.update(TESTING=False, RATELIMIT_STORAGE="memory")
         with app.app_context():
             self.assertFalse(rate_limit.rate_limit_exceeded("register", "test", 2, 60))
             self.assertFalse(rate_limit.rate_limit_exceeded("register", "test", 2, 60))
             self.assertTrue(rate_limit.rate_limit_exceeded("register", "test", 2, 60))
 
-    def test_email_is_submitted_to_background_executor(self):
-        with patch("utils.notifications._email_executor.submit") as submit:
-            queue_email("person@example.com", "Subject", "Body")
-        submit.assert_called_once()
+    def test_email_is_written_to_durable_outbox(self):
+        cursor = SimpleNamespace(lastrowid=42, execute=lambda *_args, **_kwargs: None)
+
+        @contextmanager
+        def fake_db_cursor(**_kwargs):
+            yield cursor
+
+        with patch("utils.notifications.db_cursor", fake_db_cursor):
+            message_id = queue_email("person@example.com", "Subject", "Body")
+        self.assertEqual(message_id, 42)
 
     def test_parent_cycle_is_rejected(self):
         cursor = SequencedCursor(

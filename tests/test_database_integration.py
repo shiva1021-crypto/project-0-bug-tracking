@@ -155,9 +155,12 @@ class DatabaseWorkflowIntegrationTests(unittest.TestCase):
             self.assertTrue(subtask_id)
 
             denied_assignment = tester.post(
-                f"/bugs/{story_id}/assign", data={"developer_id": str(applicant_id)}
+                f"/bugs/{story_id}/assign",
+                data={"developer_id": str(applicant_id)},
+                headers={"X-Requested-With": "XMLHttpRequest"},
             )
-            self.assertEqual(denied_assignment.status_code, 302)
+            self.assertEqual(denied_assignment.status_code, 403)
+            self.assertFalse(denied_assignment.get_json()["ok"])
 
             allowed_assignment = manager.post(
                 f"/bugs/{story_id}/assign", data={"developer_id": str(applicant_id)}
@@ -165,17 +168,23 @@ class DatabaseWorkflowIntegrationTests(unittest.TestCase):
             self.assertEqual(allowed_assignment.status_code, 302)
 
             denied_status = second_developer.post(
-                f"/bugs/{story_id}/status", data={"status": "Resolved"}
+                f"/bugs/{story_id}/status",
+                data={"status": "Resolved"},
+                headers={"X-Requested-With": "XMLHttpRequest"},
             )
-            self.assertEqual(denied_status.status_code, 302)
+            self.assertEqual(denied_status.status_code, 403)
+            self.assertFalse(denied_status.get_json()["ok"])
             connection.commit()
             cursor.execute("SELECT status FROM bugs WHERE id = %s", (story_id,))
             self.assertEqual(cursor.fetchone()[0], "In Progress")
 
             allowed_status = applicant.post(
-                f"/bugs/{story_id}/status", data={"status": "Resolved"}
+                f"/bugs/{story_id}/status",
+                data={"status": "Resolved"},
+                headers={"X-Requested-With": "XMLHttpRequest"},
             )
-            self.assertEqual(allowed_status.status_code, 302)
+            self.assertEqual(allowed_status.status_code, 200)
+            self.assertTrue(allowed_status.get_json()["ok"])
             connection.commit()
             cursor.execute("SELECT status FROM bugs WHERE id = %s", (story_id,))
             self.assertEqual(cursor.fetchone()[0], "Resolved")
@@ -219,6 +228,10 @@ class DatabaseWorkflowIntegrationTests(unittest.TestCase):
             app.config["BOARD_PAGE_SIZE"] = original_page_size
             app.config["REQUIRE_EMAIL_VERIFICATION"] = original_verification
             if organization_id is not None:
+                cursor.execute(
+                    "DELETE FROM email_outbox WHERE recipient LIKE %s",
+                    (f"%-{token}@integration.test",),
+                )
                 cursor.execute("DELETE FROM organizations WHERE id = %s", (organization_id,))
                 connection.commit()
             cursor.close()

@@ -13,16 +13,36 @@ BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
 
+def _development_secret():
+    secret_file = BASE_DIR / ".dev_secret_key"
+    try:
+        saved = secret_file.read_text(encoding="utf-8").strip()
+        if len(saved) >= 32:
+            return saved
+    except FileNotFoundError:
+        pass
+
+    generated = secrets.token_urlsafe(48)
+    try:
+        secret_file.write_text(generated, encoding="utf-8")
+    except OSError:
+        return generated
+    return generated
+
+
 def _secret_key():
     environment = os.getenv("APP_ENV", "development").lower()
     configured = os.getenv("SECRET_KEY", "")
-    is_weak = len(configured) < 32 or configured == "change-this-local-dev-secret"
+    is_placeholder = configured == "change-this-local-dev-secret"
+    is_weak = len(configured) < 32 or is_placeholder
 
     if environment == "production" and is_weak:
         raise RuntimeError(
             "Production requires SECRET_KEY to be set to a random value of at least 32 characters."
         )
-    return secrets.token_urlsafe(48) if is_weak else configured
+    if configured and not is_placeholder:
+        return configured
+    return _development_secret()
 
 
 class Config:
@@ -33,7 +53,10 @@ class Config:
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
-    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+    SESSION_COOKIE_SECURE = (
+        APP_ENV == "production"
+        or os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
+    )
     PERMANENT_SESSION_LIFETIME = int(os.getenv("SESSION_LIFETIME_SECONDS", "7200"))
     PAGE_SIZE = max(int(os.getenv("PAGE_SIZE", "20")), 1)
     BOARD_PAGE_SIZE = max(int(os.getenv("BOARD_PAGE_SIZE", "40")), 1)
@@ -45,6 +68,20 @@ class Config:
         APP_ENV == "production"
         or os.getenv("REQUIRE_EMAIL_VERIFICATION", "false").lower() == "true"
     )
+    RATELIMIT_STORAGE = os.getenv("RATELIMIT_STORAGE", "database").lower()
+    NOTIFICATION_WORKER_ENABLED = (
+        os.getenv("NOTIFICATION_WORKER_ENABLED", "true").lower() == "true"
+    )
+    TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").lower() == "true"
+    PROXY_FIX_X_FOR = max(int(os.getenv("PROXY_FIX_X_FOR", "1")), 0)
+    PROXY_FIX_X_PROTO = max(int(os.getenv("PROXY_FIX_X_PROTO", "1")), 0)
+    PROXY_FIX_X_HOST = max(int(os.getenv("PROXY_FIX_X_HOST", "1")), 0)
+    PROXY_FIX_X_PREFIX = max(int(os.getenv("PROXY_FIX_X_PREFIX", "1")), 0)
+    TRUSTED_HOSTS = [
+        host.strip()
+        for host in os.getenv("TRUSTED_HOSTS", "").split(",")
+        if host.strip()
+    ] or None
     WTF_CSRF_ENABLED = True
 
 
