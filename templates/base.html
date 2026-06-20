@@ -13,7 +13,10 @@
             <div class="jira-header-left">
                 <button class="nav-toggle" type="button" aria-label="Toggle navigation" style="display: none;">Menu</button>
                 <a class="brand" href="{{ url_for('index') }}">
-                    <span class="brand-mark">IF</span>
+                    <svg class="brand-logo" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; overflow: visible;">
+                        <path d="M11.5 12.5L7.5 6.5C7.2 6.1 6.6 6.0 6.2 6.3L2.2 9.3C1.8 9.6 1.7 10.2 2.0 10.6L10.0 22.0C10.3 22.4 10.9 22.5 11.3 22.2L15.3 19.2C15.7 18.9 15.8 18.3 15.5 17.9L11.5 12.5Z" fill="#0C66E4"/>
+                        <path d="M22.0 10.5L17.0 3.5C16.7 3.1 16.1 3.0 15.7 3.3L11.7 6.3C11.3 6.6 11.2 7.2 11.5 7.6L19.5 19.0C19.8 19.4 20.4 19.5 20.8 19.2L24.8 16.2C25.2 15.9 25.3 15.3 25.0 14.9L22.0 10.5Z" fill="#2684FF"/>
+                    </svg>
                     <span>BugTracker<small>Work management</small></span>
                 </a>
                 {% if current_user_id %}
@@ -22,6 +25,8 @@
                     <a href="{{ url_for('project.projects') }}">Projects</a>
                     <a href="{{ url_for('bug.view_bugs') }}">Issues</a>
                     <a href="{{ url_for('bug.backlog') }}">Backlog</a>
+                    <a href="{{ url_for('bug.versions') }}">Releases</a>
+                    <a href="{{ url_for('bug.automation_rules') }}">Automation</a>
                     <a class="btn-create-issue" href="{{ url_for('bug.add_bug') }}">+ Create</a>
                 </nav>
                 {% endif %}
@@ -89,6 +94,18 @@
                             <a href="{{ url_for('bug.backlog') }}" class="{% if request.path == url_for('bug.backlog') %}active{% endif %}">
                                 <span class="sidebar-icon">📝</span>
                                 <span class="sidebar-text">Backlog</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('bug.versions') }}" class="{% if request.path == url_for('bug.versions') %}active{% endif %}">
+                                <span class="sidebar-icon">🏷️</span>
+                                <span class="sidebar-text">Releases</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('bug.automation_rules') }}" class="{% if request.path == url_for('bug.automation_rules') %}active{% endif %}">
+                                <span class="sidebar-icon">⚡</span>
+                                <span class="sidebar-text">Automation</span>
                             </a>
                         </li>
                         {% if current_user_role in ['admin', 'project_manager'] %}

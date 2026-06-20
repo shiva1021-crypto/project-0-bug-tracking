@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_type_icon, render_priority_icon %}
 
 {% block title %}{{ bug.issue_key }} — {{ bug.title }}{% endblock %}
 
@@ -9,7 +10,7 @@
     <span>/</span>
     <a href="{{ url_for('project.board', project=bug.project_id) }}">{{ bug.project_name }}</a>
     <span>/</span>
-    <strong>{{ bug.issue_key }}</strong>
+    <strong>{{ render_type_icon(bug.issue_type, 13) }} {{ bug.issue_key }}</strong>
 </div>
 
 <!-- Header layout: Title and edit button -->
@@ -84,6 +85,47 @@
             </p>
         </article>
 
+        <!-- Linked Issues -->
+        {% if linked_outward or linked_inward %}
+            <section class="panel">
+                <h2 style="margin-bottom: 12px; font-size: 16px; font-weight: 600;">Linked Issues</h2>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    {% for link in linked_outward %}
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 11px; min-width: 90px;">{{ link.label }}</span>
+                            <a href="{{ url_for('bug.bug_details', bug_id=link.other_id) }}" style="font-weight: 600;">
+                                {{ link.issue_key }}
+                            </a>
+                            <span style="color: var(--text-subtle); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ link.title }}</span>
+                            <span class="status-badge status-{{ link.status.lower().replace(' ', '_') }}" style="font-size: 10px; padding: 0 6px;">{{ link.status }}</span>
+                            {% if current_user_role in ['admin', 'project_manager'] %}
+                                <form method="POST" action="{{ url_for('bug.unlink_issue', bug_id=bug.id, link_id=link.link_id) }}" style="margin:0;">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" style="font-size:11px;padding:1px 6px;min-height:20px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--text-muted);cursor:pointer;">✕</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    {% for link in linked_inward %}
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--border);">
+                            <span style="color: var(--text-muted); font-size: 11px; min-width: 90px;">{{ link.label }}</span>
+                            <a href="{{ url_for('bug.bug_details', bug_id=link.other_id) }}" style="font-weight: 600;">
+                                {{ link.issue_key }}
+                            </a>
+                            <span style="color: var(--text-subtle); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ link.title }}</span>
+                            <span class="status-badge status-{{ link.status.lower().replace(' ', '_') }}" style="font-size: 10px; padding: 0 6px;">{{ link.status }}</span>
+                            {% if current_user_role in ['admin', 'project_manager'] %}
+                                <form method="POST" action="{{ url_for('bug.unlink_issue', bug_id=bug.id, link_id=link.link_id) }}" style="margin:0;">
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" style="font-size:11px;padding:1px 6px;min-height:20px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--text-muted);cursor:pointer;">✕</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
         <!-- Child issues list if exists -->
         {% if children %}
             <section class="panel">
@@ -92,7 +134,10 @@
                     {% for child in children %}
                         <a href="{{ url_for('bug.bug_details', bug_id=child.id) }}">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="issue-type-badge type-{{ child.issue_type.lower() }}" style="font-size: 9px; padding: 1px 4px;">{{ child.issue_type }}</span>
+                                <span class="issue-type-badge type-{{ child.issue_type.lower() }}" style="font-size: 9px; padding: 1px 4px; display: inline-flex; align-items: center; gap: 4px;">
+                                    {{ render_type_icon(child.issue_type, 11) }}
+                                    {{ child.issue_type }}
+                                </span>
                                 <strong style="color: var(--text-muted);">{{ child.issue_key }}</strong>
                                 <span>{{ child.title }}</span>
                             </div>
@@ -233,19 +278,9 @@
                 <div class="detail-stat-item">
                     <span class="detail-stat-label">Priority</span>
                     <span class="detail-stat-value">
-                        <span class="priority-badge">
-                            {% if bug.priority in ['Urgent', 'Highest'] %}
-                                <span class="priority-icon priority-highest">▲</span>
-                            {% elif bug.priority == 'High' %}
-                                <span class="priority-icon priority-high">▲</span>
-                            {% elif bug.priority == 'Medium' %}
-                                <span class="priority-icon priority-medium">＝</span>
-                            {% elif bug.priority == 'Low' %}
-                                <span class="priority-icon priority-low">▼</span>
-                            {% else %}
-                                <span class="priority-icon priority-lowest">▼</span>
-                            {% endif %}
-                            <span style="margin-left: 4px;">{{ bug.priority }}</span>
+                        <span class="priority-badge" style="display: inline-flex; align-items: center; gap: 4px;">
+                            {{ render_priority_icon(bug.priority, 13) }}
+                            <span>{{ bug.priority }}</span>
                         </span>
                     </span>
                 </div>
@@ -260,6 +295,18 @@
                 <div class="detail-stat-item">
                     <span class="detail-stat-label">Category</span>
                     <span class="detail-stat-value">{{ bug.category or "General" }}</span>
+                </div>
+
+                <!-- Fix Version -->
+                <div class="detail-stat-item">
+                    <span class="detail-stat-label">Fix Version</span>
+                    <span class="detail-stat-value">
+                        {% if bug.fix_version_name %}
+                            {{ bug.fix_version_name }}
+                        {% else %}
+                            <span style="color: var(--text-muted);">None</span>
+                        {% endif %}
+                    </span>
                 </div>
 
                 <!-- Story Points -->
@@ -285,6 +332,42 @@
                         {% endif %}
                     </span>
                 </div>
+
+                <!-- Time Estimate -->
+                <div class="detail-stat-item">
+                    <span class="detail-stat-label">Time Estimate</span>
+                    <span class="detail-stat-value">
+                        {% if bug.time_estimate %}
+                            {{ bug.time_estimate }}h
+                        {% else %}
+                            <span style="color: var(--text-muted);">—</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <!-- Time Spent -->
+                <div class="detail-stat-item">
+                    <span class="detail-stat-label">Time Spent</span>
+                    <span class="detail-stat-value">
+                        {% if total_time_spent %}
+                            {{ total_time_spent }}h
+                        {% else %}
+                            <span style="color: var(--text-muted);">0h</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                <!-- Time Remaining -->
+                <div class="detail-stat-item">
+                    <span class="detail-stat-label">Time Remaining</span>
+                    <span class="detail-stat-value">
+                        {% if bug.time_remaining %}
+                            {{ bug.time_remaining }}h
+                        {% else %}
+                            <span style="color: var(--text-muted);">—</span>
+                        {% endif %}
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -304,6 +387,117 @@
                     </div>
                     <button type="submit" style="width: 100%; min-height: 32px; font-size: 12px; margin-top: 8px;">Update Assignment</button>
                 </form>
+            </div>
+        {% endif %}
+
+        <!-- Link Issue panel -->
+        {% if current_user_role in ['admin', 'project_manager', 'developer'] %}
+            <div class="detail-stats-panel">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 14px;">Link Issue</h2>
+                <form method="POST" action="{{ url_for('bug.link_issue', bug_id=bug.id) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="other_key" style="font-size: 11px;">Issue Key</label>
+                        <input type="text" id="other_key" name="other_key" placeholder="e.g. WEB-42" style="width:100%;min-height:28px;padding:4px 8px;font-size:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                    </div>
+                    <div class="form-group" style="margin-top:6px;">
+                        <label for="link_type" style="font-size: 11px;">Link Type</label>
+                        <select id="link_type" name="link_type" style="width:100%;min-height:28px;font-size:13px;">
+                            <option value="relates_to">Relates to</option>
+                            <option value="blocks">Blocks</option>
+                            <option value="duplicates">Duplicates</option>
+                            <option value="clones">Clones</option>
+                        </select>
+                    </div>
+                    <button type="submit" style="width:100%;min-height:28px;font-size:12px;margin-top:8px;">Link</button>
+                </form>
+            </div>
+        {% endif %}
+
+        <!-- Custom Fields panel -->
+        {% if custom_fields %}
+            <div class="detail-stats-panel">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 14px;">Custom Fields</h2>
+                {% for field in custom_fields %}
+                    <div class="detail-stat-item" style="border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px;">
+                        <span class="detail-stat-label">{{ field.name }}</span>
+                        <span class="detail-stat-value">
+                            {% if field.field_type == 'checkbox' %}
+                                {% if custom_field_values.get(field.id|string) == 'yes' %}
+                                    <span style="color: var(--success);">✓ Yes</span>
+                                {% else %}
+                                    <span style="color: var(--text-muted);">No</span>
+                                {% endif %}
+                            {% elif custom_field_values.get(field.id|string) %}
+                                {{ custom_field_values.get(field.id|string) }}
+                            {% else %}
+                                <span style="color: var(--text-muted);">—</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Time Tracking panel -->
+        {% if current_user_role in ['admin', 'project_manager', 'developer'] %}
+            <div class="detail-stats-panel" id="time-tracking-panel">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 14px;">Time Tracking</h2>
+
+                <!-- Log Time -->
+                <form method="POST" action="{{ url_for('bug.log_time_route', bug_id=bug.id) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="hours_spent" style="font-size: 11px;">Hours Spent</label>
+                        <input type="number" step="0.5" min="0.5" id="hours_spent" name="hours_spent" placeholder="e.g. 2.5" style="width:100%;min-height:28px;padding:4px 8px;font-size:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                    </div>
+                    <div class="form-group" style="margin-top:6px;">
+                        <label for="description" style="font-size: 11px;">Work Description</label>
+                        <input type="text" id="description" name="description" placeholder="What did you do?" style="width:100%;min-height:28px;padding:4px 8px;font-size:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                    </div>
+                    <button type="submit" style="width:100%;min-height:28px;font-size:12px;margin-top:8px;">Log Time</button>
+                </form>
+
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;">
+
+                <!-- Update Estimate -->
+                <form method="POST" action="{{ url_for('bug.update_time_estimate_route', bug_id=bug.id) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="time_estimate" style="font-size: 11px;">Original Estimate (hours)</label>
+                        <input type="number" step="0.5" min="0" id="time_estimate" name="time_estimate" value="{{ bug.time_estimate or '' }}" placeholder="e.g. 8" style="width:100%;min-height:28px;padding:4px 8px;font-size:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                    </div>
+                    <button type="submit" style="width:100%;min-height:28px;font-size:12px;margin-top:8px;">Set Estimate</button>
+                </form>
+
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;">
+
+                <!-- Update Remaining -->
+                <form method="POST" action="{{ url_for('bug.update_time_remaining_route', bug_id=bug.id) }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group">
+                        <label for="time_remaining" style="font-size: 11px;">Remaining Estimate (hours)</label>
+                        <input type="number" step="0.5" min="0" id="time_remaining" name="time_remaining" value="{{ bug.time_remaining or '' }}" placeholder="e.g. 5" style="width:100%;min-height:28px;padding:4px 8px;font-size:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);">
+                    </div>
+                    <button type="submit" style="width:100%;min-height:28px;font-size:12px;margin-top:8px;">Set Remaining</button>
+                </form>
+
+                {% if time_entries %}
+                    <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;">
+                    <h3 style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">Logged Work</h3>
+                    {% for entry in time_entries %}
+                        <div style="font-size: 11px; padding: 6px 0; border-bottom: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between;">
+                                <strong>{{ entry.user_name }}</strong>
+                                <span>{{ entry.hours_spent }}h</span>
+                            </div>
+                            {% if entry.description %}
+                                <div style="color: var(--text-muted); margin-top: 2px;">{{ entry.description }}</div>
+                            {% endif %}
+                            <div style="color: var(--text-subtle); margin-top: 2px;">{{ entry.logged_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </div>
         {% endif %}
 

@@ -37,7 +37,7 @@ def save_assignment(cursor, issue_id, organization_id, actor_id, old_assignment,
 
 def get_status_context(cursor, issue_id, organization_id):
     cursor.execute(
-        "SELECT status, assigned_to FROM bugs WHERE id = %s AND organization_id = %s",
+        "SELECT status, assigned_to, project_id FROM bugs WHERE id = %s AND organization_id = %s",
         (issue_id, organization_id),
     )
     return cursor.fetchone()

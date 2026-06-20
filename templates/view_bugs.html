@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_type_icon, render_priority_icon %}
 
 {% block title %}Issues — BugTracker{% endblock %}
 
@@ -11,9 +12,27 @@
     <a class="button" href="{{ url_for('bug.add_bug') }}">+ Create Issue</a>
 </div>
 
+<!-- Saved Filters Bar -->
+<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+    {% if saved_filters %}
+    <div style="display: flex; align-items: center; gap: 4px;">
+        <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Saved:</span>
+        {% for sf in saved_filters %}
+            <a href="{{ url_for('bug.load_filter', filter_id=sf.id) }}"
+               style="font-size: 12px; padding: 2px 8px; border-radius: 3px; background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); text-decoration: none; white-space: nowrap;">
+                {{ sf.name }}
+            </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <button type="button" class="button-secondary" style="font-size:12px;min-height:28px;padding:4px 10px;" onclick="document.getElementById('saveFilterModal').classList.add('open')">
+        Save current filters
+    </button>
+</div>
+
 <!-- Search & Filters Toolbar -->
 <form method="GET" class="filter-box">
-    <input type="search" name="q" placeholder="Search keys, summaries, or descriptions..." value="{{ filters.get('q', '') }}" style="max-width: 280px; min-width: 200px;">
+    <input type="search" name="q" placeholder="Search by key, title, reporter, or assignee..." value="{{ filters.get('q', '') }}" style="max-width: 280px; min-width: 200px;" title="Search across issue key, title, description, reporter name, and assignee name">
     
     <select name="project" aria-label="Filter by Project">
         <option value="">All Projects</option>
@@ -82,18 +101,8 @@
                     <tr>
                         <td><strong style="color: var(--text-muted);">{{ bug.issue_key }}</strong></td>
                         <td>
-                            <span class="issue-type-badge type-{{ bug.issue_type.lower() }}">
-                                {% if bug.issue_type == 'Bug' %}
-                                    <span class="type-icon">🔴</span>
-                                {% elif bug.issue_type == 'Story' %}
-                                    <span class="type-icon">🟢</span>
-                                {% elif bug.issue_type == 'Task' %}
-                                    <span class="type-icon">🔵</span>
-                                {% elif bug.issue_type == 'Epic' %}
-                                    <span class="type-icon">⚡</span>
-                                {% else %}
-                                    <span class="type-icon">⎋</span>
-                                {% endif %}
+                            <span class="issue-type-badge type-{{ bug.issue_type.lower() }}" style="display: inline-flex; align-items: center; gap: 4px;">
+                                {{ render_type_icon(bug.issue_type, 13) }}
                                 {{ bug.issue_type }}
                             </span>
                         </td>
@@ -101,19 +110,9 @@
                             <a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}" style="font-weight: 600; color: var(--text);">{{ bug.title }}</a>
                         </td>
                         <td>
-                            <span class="priority-badge" title="Priority: {{ bug.priority }}">
-                                {% if bug.priority in ['Urgent', 'Highest'] %}
-                                    <span class="priority-icon priority-highest">▲</span>
-                                {% elif bug.priority == 'High' %}
-                                    <span class="priority-icon priority-high">▲</span>
-                                {% elif bug.priority == 'Medium' %}
-                                    <span class="priority-icon priority-medium">＝</span>
-                                {% elif bug.priority == 'Low' %}
-                                    <span class="priority-icon priority-low">▼</span>
-                                {% else %}
-                                    <span class="priority-icon priority-lowest">▼</span>
-                                {% endif %}
-                                <span style="font-size: 13px; font-weight: 600; margin-left: 4px; color: var(--text-subtle);">{{ bug.priority }}</span>
+                            <span class="priority-badge" title="Priority: {{ bug.priority }}" style="display: inline-flex; align-items: center; gap: 4px;">
+                                {{ render_priority_icon(bug.priority, 13) }}
+                                <span style="font-size: 13px; font-weight: 600; color: var(--text-subtle);">{{ bug.priority }}</span>
                             </span>
                         </td>
                         <td>
@@ -166,4 +165,48 @@
         {% endif %}
     </nav>
 {% endif %}
+
+<!-- Save Filter Modal -->
+<div class="modal-overlay" id="saveFilterModal">
+    <div class="modal-box">
+        <h2>Save Current Filters</h2>
+        <form method="POST" action="{{ url_for('bug.save_filter') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            {% for key in ('q', 'status', 'priority', 'severity', 'assigned_to', 'project', 'issue_type') %}
+                {% if filters.get(key) %}
+                    <input type="hidden" name="{{ key }}" value="{{ filters[key] }}">
+                {% endif %}
+            {% endfor %}
+            <label for="filter_name">Filter Name</label>
+            <input type="text" id="filter_name" name="name" required placeholder="e.g. My High Priority Bugs" style="width:100%;padding:8px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;">
+            <div class="modal-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+                <button type="button" class="button-secondary" onclick="document.getElementById('saveFilterModal').classList.remove('open')">Cancel</button>
+                <button type="submit" class="button">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    min-width: 360px;
+    max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.modal-box h2 { margin: 0 0 16px; font-size: 18px; }
+.modal-box label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+</style>
 {% endblock %}

@@ -13,6 +13,7 @@ from repositories.workflow_repository import (
     save_status,
     set_watching,
 )
+from services.automation_service import execute_automation_rules
 from services.issue_service import STATUSES
 from utils.decorators import can_update_bug_status, login_required, role_required
 from utils.notifications import queue_email
@@ -100,6 +101,14 @@ def register_workflow_routes(bp):
                 cursor, bug_id, session["organization_id"],
                 (session["user_id"], reporter["reporter_id"]),
             )
+
+        execute_automation_rules(
+            session["organization_id"], bug["project_id"] if "project_id" in bug else None,
+            "status_changed",
+            {"bug_id": bug_id, "old_status": old_status, "new_status": new_status,
+             "actor_id": session["user_id"], "organization_id": session["organization_id"],
+             "issue_key": reporter["issue_key"]},
+        )
 
         queue_email(
             reporter["email"],

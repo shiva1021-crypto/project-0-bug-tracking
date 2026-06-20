@@ -15,7 +15,16 @@ from werkzeug.utils import secure_filename
 from PIL import Image, UnidentifiedImageError
 
 from config import get_db_connection
+from repositories.filter_repository import get_saved_filters
+from repositories.custom_field_repository import (
+    get_field_definitions,
+    get_field_values,
+    save_field_value,
+)
 from repositories.issue_repository import get_developers, get_projects
+from services.automation_service import execute_automation_rules
+from repositories.link_repository import get_linked_issues
+from repositories.version_repository import get_versions_for_project
 from services.issue_service import (
     DEFAULT_CATEGORIES,
     ISSUE_TYPES,
@@ -86,50 +95,6 @@ def delete_screenshot(filename):
 
 
 def register_bug_routes(bp):
-    @bp.route("/dashboard")
-    @login_required
-    def dashboard():
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.execute(
-            """
-            SELECT
-                COUNT(*) AS total_bugs,
-                SUM(status = 'Open') AS open_bugs,
-                SUM(status = 'In Progress') AS in_progress_bugs,
-                SUM(status = 'Resolved') AS resolved_bugs,
-                SUM(status = 'Closed') AS closed_bugs,
-                SUM(severity IN ('Critical', 'Blocker')) AS critical_bugs
-            FROM bugs
-            WHERE organization_id = %s
-            """,
-            (session["organization_id"],),
-        )
-        stats = cursor.fetchone()
-
-        cursor.execute(
-            """
-            SELECT bugs.id, bugs.issue_key, bugs.issue_type, bugs.title, bugs.priority, bugs.severity, bugs.status,
-                   bugs.created_at, reporter.full_name AS reporter_name,
-                   developer.full_name AS developer_name
-            FROM bugs
-            JOIN users AS reporter ON bugs.reporter_id = reporter.id
-            LEFT JOIN users AS developer ON bugs.assigned_to = developer.id
-            WHERE bugs.organization_id = %s
-            ORDER BY bugs.created_at DESC
-            LIMIT 6
-            """,
-            (session["organization_id"],),
-        )
-        recent_bugs = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
-        return render_template("dashboard.html", stats=stats, recent_bugs=recent_bugs)
-
-
     @bp.route("/bugs/add", methods=["GET", "POST"])
     @role_required("tester", "developer", "admin", "project_manager")
     def add_bug():
@@ -145,6 +110,7 @@ def register_bug_routes(bp):
             issue_type = request.form.get("issue_type", "Bug")
             parent_id = request.form.get("parent_id", "")
             labels = normalized_labels(request.form.get("labels", ""))
+            fix_version_id = request.form.get("fix_version_id", "")
 
             try:
                 story_points = parsed_story_points(request.form.get("story_points", ""))
@@ -209,15 +175,17 @@ def register_bug_routes(bp):
                     INSERT INTO bugs
                     (organization_id, project_id, issue_key, issue_type, parent_id,
                      title, description, reproduction_steps, category, priority, severity,
-                     reporter_id, screenshot_path, external_issue_url, labels, story_points, due_date)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                     reporter_id, screenshot_path, external_issue_url, labels, story_points, due_date,
+                     fix_version_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (
-                        session["organization_id"], project["id"], issue_key, issue_type,
-                        valid_parent_id, title, description, reproduction_steps, category,
-                        priority, severity, session["user_id"], screenshot_filename,
-                        external_issue_url or None, labels, story_points, due_date,
-                    ),
+            (
+                session["organization_id"], project["id"], issue_key, issue_type,
+                valid_parent_id, title, description, reproduction_steps, category,
+                priority, severity, session["user_id"], screenshot_filename,
+                external_issue_url or None, labels, story_points, due_date,
+                int(fix_version_id) if fix_version_id.isdigit() else None,
+            ),
                 )
                 bug_id = cursor.lastrowid
                 cursor.execute(
@@ -227,6 +195,10 @@ def register_bug_routes(bp):
                     """,
                     (bug_id, session["user_id"], "Open", f"{issue_type} {issue_key} created"),
                 )
+                for key, value in request.form.items():
+                    if key.startswith("cf_") and value:
+                        field_id = int(key[3:])
+                        save_field_value(cursor, bug_id, field_id, value)
                 conn.commit()
             except Exception:
                 conn.rollback()
@@ -236,6 +208,11 @@ def register_bug_routes(bp):
                 cursor.close()
                 conn.close()
 
+            execute_automation_rules(
+                session["organization_id"], project["id"], "issue_created",
+                {"bug_id": bug_id, "issue_key": issue_key, "issue_type": issue_type,
+                 "actor_id": session["user_id"], "organization_id": session["organization_id"]},
+            )
             flash(f"Issue {issue_key} created successfully.", "success")
             return redirect(url_for("bug.bug_details", bug_id=bug_id))
 
@@ -252,6 +229,9 @@ def register_bug_routes(bp):
             (session["organization_id"],),
         )
         parents = cursor.fetchall()
+        versions = []
+        if projects:
+            versions = get_versions_for_project(cursor, session["organization_id"], projects[0]["id"])
         cursor.close()
         conn.close()
         if not projects:
@@ -265,6 +245,7 @@ def register_bug_routes(bp):
             issue_types=ISSUE_TYPES,
             projects=projects,
             parents=parents,
+            versions=versions,
         )
 
 
@@ -311,8 +292,11 @@ def register_bug_routes(bp):
             select_query += " AND bugs.issue_type = %s"
             params.append(issue_type)
         if search:
-            select_query += " AND (bugs.issue_key LIKE %s OR bugs.title LIKE %s OR bugs.description LIKE %s)"
-            params.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+            select_query += (
+                " AND (bugs.issue_key LIKE %s OR bugs.title LIKE %s OR bugs.description LIKE %s"
+                " OR reporter.full_name LIKE %s OR developer.full_name LIKE %s)"
+            )
+            params.extend([f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%", f"%{search}%"])
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -329,6 +313,7 @@ def register_bug_routes(bp):
         bugs = cursor.fetchall()
         developers = get_developers(cursor, session["organization_id"])
         projects = get_projects(cursor, session["organization_id"])
+        saved_filters = get_saved_filters(cursor, session["user_id"], session["organization_id"])
         cursor.close()
         conn.close()
 
@@ -336,6 +321,7 @@ def register_bug_routes(bp):
             "view_bugs.html",
             bugs=bugs,
             developers=developers,
+            saved_filters=saved_filters,
             statuses=STATUSES,
             priorities=PRIORITIES,
             severities=SEVERITIES,
@@ -358,12 +344,14 @@ def register_bug_routes(bp):
             SELECT bugs.*, reporter.full_name AS reporter_name,
                    developer.full_name AS developer_name,
                    projects.name AS project_name, projects.project_key,
-                   parent.issue_key AS parent_issue_key, parent.title AS parent_title
+                   parent.issue_key AS parent_issue_key, parent.title AS parent_title,
+                   versions.name AS fix_version_name
             FROM bugs
             JOIN projects ON bugs.project_id = projects.id
             JOIN users AS reporter ON bugs.reporter_id = reporter.id
             LEFT JOIN users AS developer ON bugs.assigned_to = developer.id
             LEFT JOIN bugs AS parent ON bugs.parent_id = parent.id
+            LEFT JOIN versions ON bugs.fix_version_id = versions.id
             WHERE bugs.id = %s AND bugs.organization_id = %s
             """,
             (bug_id, session["organization_id"]),
@@ -427,6 +415,16 @@ def register_bug_routes(bp):
         )
         history = cursor.fetchall()
         developers = get_developers(cursor, session["organization_id"])
+        linked_outward, linked_inward = get_linked_issues(cursor, bug_id)
+        from repositories.time_repository import (
+            get_time_entries,
+            get_total_time_spent,
+        )
+
+        time_entries = get_time_entries(cursor, bug_id)
+        total_time_spent = get_total_time_spent(cursor, bug_id)
+        custom_fields = get_field_definitions(cursor, session["organization_id"], bug["project_id"])
+        custom_field_values = get_field_values(cursor, bug_id)
 
         cursor.close()
         conn.close()
@@ -439,8 +437,14 @@ def register_bug_routes(bp):
             children=children,
             watcher_info=watcher_info,
             developers=developers,
+            linked_outward=linked_outward,
+            linked_inward=linked_inward,
             statuses=STATUSES,
             can_update_status=can_update_bug_status(bug, session["user_id"], session.get("role")),
+            time_entries=time_entries,
+            total_time_spent=total_time_spent,
+            custom_fields=custom_fields,
+            custom_field_values=custom_field_values,
         )
 
 
@@ -486,6 +490,8 @@ def register_bug_routes(bp):
                 flash(str(exc), "error")
                 return redirect(url_for("bug.edit_bug", bug_id=bug_id))
 
+            fix_version_id = request.form.get("fix_version_id", "")
+
             if (
                 not title
                 or not description
@@ -523,14 +529,15 @@ def register_bug_routes(bp):
                         category = %s, priority = %s, severity = %s,
                         screenshot_path = %s, external_issue_url = %s,
                         issue_type = %s, parent_id = %s, labels = %s,
-                        story_points = %s, due_date = %s
+                        story_points = %s, due_date = %s, fix_version_id = %s
                     WHERE id = %s AND organization_id = %s
                     """,
                     (
                         title, description, reproduction_steps, category, priority, severity,
                         screenshot_filename, external_issue_url or None, issue_type,
-                        valid_parent_id, labels, story_points, due_date, bug_id,
-                        session["organization_id"],
+                        valid_parent_id, labels, story_points, due_date,
+                        int(fix_version_id) if fix_version_id.isdigit() else None,
+                        bug_id, session["organization_id"],
                     ),
                 )
                 cursor.execute(
@@ -540,6 +547,10 @@ def register_bug_routes(bp):
                     """,
                     (bug_id, session["user_id"], "Bug details edited"),
                 )
+                for key, value in request.form.items():
+                    if key.startswith("cf_") and value:
+                        field_id = int(key[3:])
+                        save_field_value(cursor, bug_id, field_id, value)
                 conn.commit()
             except Exception:
                 conn.rollback()
@@ -551,6 +562,12 @@ def register_bug_routes(bp):
 
             if uploaded and bug["screenshot_path"] != uploaded:
                 delete_screenshot(bug["screenshot_path"])
+
+            execute_automation_rules(
+                session["organization_id"], bug["project_id"], "field_updated",
+                {"bug_id": bug_id, "issue_key": bug["issue_key"],
+                 "actor_id": session["user_id"], "organization_id": session["organization_id"]},
+            )
 
             flash("Bug updated successfully.", "success")
             return redirect(url_for("bug.bug_details", bug_id=bug_id))
@@ -566,6 +583,8 @@ def register_bug_routes(bp):
             (session["organization_id"], bug["project_id"], bug_id),
         )
         parents = cursor.fetchall()
+        versions = get_versions_for_project(cursor, session["organization_id"], bug["project_id"])
+        custom_field_values = get_field_values(cursor, bug_id)
         cursor.close()
         conn.close()
         return render_template(
@@ -576,4 +595,6 @@ def register_bug_routes(bp):
             categories=DEFAULT_CATEGORIES,
             issue_types=ISSUE_TYPES,
             parents=parents,
+            versions=versions,
+            custom_field_values=custom_field_values,
         )

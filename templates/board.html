@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_type_icon, render_priority_icon %}
 
 {% block title %}Kanban Board — BugTracker{% endblock %}
 
@@ -366,17 +367,7 @@
                             <div class="kanban-card-meta-left">
                                 <!-- Issue Type Icon Badge -->
                                 <span class="kanban-issue-type-icon" title="Type: {{ issue.issue_type }}">
-                                    {% if issue.issue_type == 'Bug' %}
-                                        🔴
-                                    {% elif issue.issue_type == 'Story' %}
-                                        🟢
-                                    {% elif issue.issue_type == 'Task' %}
-                                        🟣
-                                    {% elif issue.issue_type == 'Epic' %}
-                                        ⚡
-                                    {% else %}
-                                        ⎋
-                                    {% endif %}
+                                    {{ render_type_icon(issue.issue_type, 13) }}
                                 </span>
                                 <!-- Issue Key Link -->
                                 <strong class="kanban-issue-key">{{ issue.issue_key }}</strong>
@@ -385,17 +376,7 @@
                             <div class="kanban-card-meta-right">
                                 <!-- Priority Icon -->
                                 <span class="priority-badge-mini" title="Priority: {{ issue.priority }}">
-                                    {% if issue.priority in ['Urgent', 'Highest'] %}
-                                        <span class="priority-icon priority-highest">▲</span>
-                                    {% elif issue.priority == 'High' %}
-                                        <span class="priority-icon priority-high">▲</span>
-                                    {% elif issue.priority == 'Medium' %}
-                                        <span class="priority-icon priority-medium">＝</span>
-                                    {% elif issue.priority == 'Low' %}
-                                        <span class="priority-icon priority-low">▼</span>
-                                    {% else %}
-                                        <span class="priority-icon priority-lowest">▼</span>
-                                    {% endif %}
+                                    {{ render_priority_icon(issue.priority, 13) }}
                                 </span>
                                 
                                 <!-- Estimate point bubble -->

@@ -50,7 +50,12 @@
             <p>{{ project.description or "No description provided." }}</p>
             <div class="project-card-footer">
                 <span style="color: var(--text-muted);">📊 {{ project.issue_count }} issues</span>
-                <a href="{{ url_for('project.board', project=project.id) }}" class="button button-secondary" style="min-height: 28px; padding: 4px 10px; font-size: 12px;">Open Board</a>
+                <div style="display: flex; gap: 4px;">
+                    {% if current_user_role in ['admin', 'project_manager'] %}
+                        <a href="{{ url_for('bug.project_custom_fields', project_id=project.id) }}" class="button button-secondary" style="min-height: 28px; padding: 4px 8px; font-size: 11px;">Fields</a>
+                    {% endif %}
+                    <a href="{{ url_for('project.board', project=project.id) }}" class="button button-secondary" style="min-height: 28px; padding: 4px 10px; font-size: 12px;">Open Board</a>
+                </div>
             </div>
         </article>
     {% else %}

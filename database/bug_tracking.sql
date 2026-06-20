@@ -126,6 +126,54 @@ CREATE TABLE IF NOT EXISTS bugs (
         FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS saved_filters (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    organization_id INT NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    filter_data JSON NOT NULL,
+    is_shared TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_saved_filters_user (user_id, organization_id),
+    CONSTRAINT fk_saved_filters_user
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_saved_filters_organization
+        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS versions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organization_id INT NOT NULL,
+    project_id INT NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    description TEXT,
+    release_date DATE NULL,
+    status ENUM('unreleased', 'released', 'archived') NOT NULL DEFAULT 'unreleased',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_versions_project_name (project_id, name),
+    INDEX idx_versions_organization (organization_id),
+    INDEX idx_versions_project (project_id),
+    CONSTRAINT fk_versions_organization
+        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_versions_project
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS issue_links (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    bug_id_a INT NOT NULL,
+    bug_id_b INT NOT NULL,
+    link_type ENUM('blocks', 'relates_to', 'duplicates', 'clones') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_issue_links_pair (bug_id_a, bug_id_b, link_type),
+    INDEX idx_issue_links_a (bug_id_a),
+    INDEX idx_issue_links_b (bug_id_b),
+    CONSTRAINT fk_issue_links_a
+        FOREIGN KEY (bug_id_a) REFERENCES bugs(id) ON DELETE CASCADE,
+    CONSTRAINT fk_issue_links_b
+        FOREIGN KEY (bug_id_b) REFERENCES bugs(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS sprints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organization_id INT NOT NULL,

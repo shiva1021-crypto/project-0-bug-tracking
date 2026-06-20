@@ -44,7 +44,7 @@
                     <span>{{ item.label }}</span>
                     <strong>{{ item.total }} ({{ item.percent }}%)</strong>
                 </div>
-                <div class="chart-track"><span style="width: {{ item.percent }}%; background: var(--primary);"></span></div>
+                <div class="chart-track"><span data-percent="{{ item.percent }}" style="background: var(--primary);"></span></div>
             </div>
         {% else %}
             <p class="empty" style="padding: 12px 0;">No status data available.</p>
@@ -58,7 +58,7 @@
                     <span>{{ item.label }}</span>
                     <strong>{{ item.total }} ({{ item.percent }}%)</strong>
                 </div>
-                <div class="chart-track"><span style="width: {{ item.percent }}%; background: var(--accent);"></span></div>
+                <div class="chart-track"><span data-percent="{{ item.percent }}" style="background: var(--accent);"></span></div>
             </div>
         {% else %}
             <p class="empty" style="padding: 12px 0;">No priority data available.</p>
@@ -72,7 +72,7 @@
                     <span>{{ item.label }}</span>
                     <strong>{{ item.total }} ({{ item.percent }}%)</strong>
                 </div>
-                <div class="chart-track"><span style="width: {{ item.percent }}%; background: var(--success);"></span></div>
+                <div class="chart-track"><span data-percent="{{ item.percent }}" style="background: var(--success);"></span></div>
             </div>
         {% else %}
             <p class="empty" style="padding: 12px 0;">No category data available.</p>
@@ -199,4 +199,15 @@
         {% endif %}
     </nav>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.chart-track span').forEach(function(span) {
+            const percent = span.getAttribute('data-percent');
+            if (percent) {
+                span.style.width = percent + '%';
+            }
+        });
+    });
+</script>
 {% endblock %}

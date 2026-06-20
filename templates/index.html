@@ -31,7 +31,12 @@
             </div>
             <div class="preview-shell">
                 <aside class="preview-sidebar">
-                    <div class="preview-logo">IF</div>
+                    <div class="preview-logo" style="display: flex; align-items: center; justify-content: center; background: #FFFFFF; border-radius: var(--radius); width: 28px; height: 28px; padding: 4px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11.5 12.5L7.5 6.5C7.2 6.1 6.6 6.0 6.2 6.3L2.2 9.3C1.8 9.6 1.7 10.2 2.0 10.6L10.0 22.0C10.3 22.4 10.9 22.5 11.3 22.2L15.3 19.2C15.7 18.9 15.8 18.3 15.5 17.9L11.5 12.5Z" fill="#0C66E4"/>
+                            <path d="M22.0 10.5L17.0 3.5C16.7 3.1 16.1 3.0 15.7 3.3L11.7 6.3C11.3 6.6 11.2 7.2 11.5 7.6L19.5 19.0C19.8 19.4 20.4 19.5 20.8 19.2L24.8 16.2C25.2 15.9 25.3 15.3 25.0 14.9L22.0 10.5Z" fill="#2684FF"/>
+                        </svg>
+                    </div>
                     <span class="active"></span>
                     <span></span>
                     <span></span>
@@ -51,31 +56,63 @@
                     <div class="preview-board">
                         <div class="preview-column">
                             <h3>To Do</h3>
-                            <article>
-                                <span class="issue-type-badge type-story" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">🟢</span> Story</span>
-                                <strong>WEB-101</strong>
-                                <p style="font-size: 10px; color: var(--text-subtle);">Refactor navigation grid</p>
+                            <article class="preview-card">
+                                <p class="preview-card-summary">Refactor navigation grid</p>
+                                <div class="preview-card-footer">
+                                    <div class="preview-card-left">
+                                        <svg class="type-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M6 3c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2v20l-6-4-6 4V3z" fill="#00875A"/></svg>
+                                        <span class="preview-card-key">WEB-101</span>
+                                    </div>
+                                    <div class="preview-card-right">
+                                        <svg class="priority-icon priority-medium" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M5 9h14M5 15h14" stroke="#F18D00" stroke-width="3" stroke-linecap="round"/></svg>
+                                        <span class="user-avatar-initial" style="background:#DEEBFF; color:#0C66E4; width:16px; height:16px; font-size:8px;">AC</span>
+                                    </div>
+                                </div>
                             </article>
-                            <article>
-                                <span class="issue-type-badge type-bug" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">🔴</span> Bug</span>
-                                <strong>WEB-103</strong>
-                                <p style="font-size: 10px; color: var(--text-subtle);">Fix mobile layout shift</p>
+                            <article class="preview-card">
+                                <p class="preview-card-summary">Fix mobile layout shift</p>
+                                <div class="preview-card-footer">
+                                    <div class="preview-card-left">
+                                        <svg class="type-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><circle cx="12" cy="12" r="10" fill="#E54937"/><circle cx="12" cy="12" r="4" fill="#FFFFFF"/></svg>
+                                        <span class="preview-card-key">WEB-103</span>
+                                    </div>
+                                    <div class="preview-card-right">
+                                        <svg class="priority-icon priority-high" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M12 3l10 16H2L12 3z" fill="#F15B2A"/></svg>
+                                        <span class="user-avatar-initial" style="background:#DFFCF0; color:#216E4E; width:16px; height:16px; font-size:8px;">LP</span>
+                                    </div>
+                                </div>
                             </article>
                         </div>
                         <div class="preview-column">
                             <h3>In Progress</h3>
-                            <article style="border-left: 3px solid var(--primary);">
-                                <span class="issue-type-badge type-task" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">🔵</span> Task</span>
-                                <strong>API-204</strong>
-                                <p style="font-size: 10px; color: var(--text-subtle);">Build database schema</p>
+                            <article class="preview-card" style="border-left: 3px solid var(--primary);">
+                                <p class="preview-card-summary">Build database schema</p>
+                                <div class="preview-card-footer">
+                                    <div class="preview-card-left">
+                                        <svg class="type-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="3" fill="#4C9AFF"/><path d="M9 11l2 2 4-4" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                        <span class="preview-card-key">API-204</span>
+                                    </div>
+                                    <div class="preview-card-right">
+                                        <svg class="priority-icon priority-highest" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M12 3l10 16H2L12 3z" fill="#E54937"/></svg>
+                                        <span class="user-avatar-initial" style="background:#EAE6FF; color:#5E4DB2; width:16px; height:16px; font-size:8px;">NW</span>
+                                    </div>
+                                </div>
                             </article>
                         </div>
                         <div class="preview-column">
                             <h3>Done</h3>
-                            <article style="opacity: 0.7;">
-                                <span class="issue-type-badge type-epic" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">⚡</span> Epic</span>
-                                <strong>MOB-401</strong>
-                                <p style="font-size: 10px; color: var(--text-subtle); text-decoration: line-through;">Release iOS application</p>
+                            <article class="preview-card" style="opacity: 0.6;">
+                                <p class="preview-card-summary" style="text-decoration: line-through;">Release iOS application</p>
+                                <div class="preview-card-footer">
+                                    <div class="preview-card-left">
+                                        <svg class="type-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><rect x="3" y="3" width="18" height="18" rx="3" fill="#8777D9"/><path d="M13 5L8 13h4l-1 6 5-8h-4l1-5z" fill="#FFFFFF"/></svg>
+                                        <span class="preview-card-key">MOB-401</span>
+                                    </div>
+                                    <div class="preview-card-right">
+                                        <svg class="priority-icon priority-low" width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;"><path d="M12 21L2 5h20L12 21z" fill="#2D8738"/></svg>
+                                        <span class="user-avatar-initial" style="background:#DEEBFF; color:#0C66E4; width:16px; height:16px; font-size:8px;">AC</span>
+                                    </div>
+                                </div>
                             </article>
                         </div>
                     </div>
@@ -155,7 +192,10 @@
     <!-- Marketing Footer -->
     <footer class="landing-footer">
         <div class="footer-brand">
-            <span class="brand-mark" style="width: 24px; height: 24px; font-size: 11px;">IF</span>
+            <svg class="brand-logo" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; overflow: visible;">
+                <path d="M11.5 12.5L7.5 6.5C7.2 6.1 6.6 6.0 6.2 6.3L2.2 9.3C1.8 9.6 1.7 10.2 2.0 10.6L10.0 22.0C10.3 22.4 10.9 22.5 11.3 22.2L15.3 19.2C15.7 18.9 15.8 18.3 15.5 17.9L11.5 12.5Z" fill="#0C66E4"/>
+                <path d="M22.0 10.5L17.0 3.5C16.7 3.1 16.1 3.0 15.7 3.3L11.7 6.3C11.3 6.6 11.2 7.2 11.5 7.6L19.5 19.0C19.8 19.4 20.4 19.5 20.8 19.2L24.8 16.2C25.2 15.9 25.3 15.3 25.0 14.9L22.0 10.5Z" fill="#2684FF"/>
+            </svg>
             <strong>BugTracker</strong>
         </div>
         <p>Built with Python Flask, MySQL and Atlassian Design tokens.</p>

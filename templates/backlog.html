@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros.html" import render_type_icon, render_priority_icon %}
 
 {% block title %}Backlog — BugTracker{% endblock %}
 
@@ -300,7 +301,7 @@
         {% for issue in active_sprint.issues %}
             <div class="backlog-issue-row" data-id="{{ issue.id }}" data-sprint-id="{{ active_sprint.id }}">
                 <span class="backlog-issue-type-icon">
-                    {% if issue.issue_type == 'Bug' %}🔴{% elif issue.issue_type == 'Story' %}🟢{% elif issue.issue_type == 'Task' %}🟣{% elif issue.issue_type == 'Epic' %}⚡{% else %}⎋{% endif %}
+                    {{ render_type_icon(issue.issue_type, 13) }}
                 </span>
                 <span class="backlog-issue-key">{{ issue.issue_key }}</span>
                 <a class="backlog-issue-title" href="{{ url_for('bug.bug_details', bug_id=issue.id) }}">{{ issue.title }}</a>
@@ -308,7 +309,7 @@
                     <span class="backlog-issue-points" title="Story points">{{ issue.story_points }}</span>
                 {% endif %}
                 <span class="backlog-issue-priority">
-                    {% if issue.priority in ['Urgent', 'Highest'] %}🔺{% elif issue.priority == 'High' %}⬆️{% elif issue.priority == 'Medium' %}🟰{% elif issue.priority == 'Low' %}⬇️{% else %}🔽{% endif %}
+                    {{ render_priority_icon(issue.priority, 13) }}
                 </span>
                 {% if current_user_role in ['admin', 'project_manager'] %}
                     <form method="POST" action="{{ url_for('bug.issue_sprint', bug_id=issue.id) }}" class="assign-sprint-form">
@@ -358,7 +359,7 @@
             {% for issue in sprint.issues %}
                 <div class="backlog-issue-row" data-id="{{ issue.id }}" data-sprint-id="{{ sprint.id }}">
                     <span class="backlog-issue-type-icon">
-                        {% if issue.issue_type == 'Bug' %}🔴{% elif issue.issue_type == 'Story' %}🟢{% elif issue.issue_type == 'Task' %}🟣{% elif issue.issue_type == 'Epic' %}⚡{% else %}⎋{% endif %}
+                        {{ render_type_icon(issue.issue_type, 13) }}
                     </span>
                     <span class="backlog-issue-key">{{ issue.issue_key }}</span>
                     <a class="backlog-issue-title" href="{{ url_for('bug.bug_details', bug_id=issue.id) }}">{{ issue.title }}</a>
@@ -366,7 +367,7 @@
                         <span class="backlog-issue-points" title="Story points">{{ issue.story_points }}</span>
                     {% endif %}
                     <span class="backlog-issue-priority">
-                        {% if issue.priority in ['Urgent', 'Highest'] %}🔺{% elif issue.priority == 'High' %}⬆️{% elif issue.priority == 'Medium' %}🟰{% elif issue.priority == 'Low' %}⬇️{% else %}🔽{% endif %}
+                        {{ render_priority_icon(issue.priority, 13) }}
                     </span>
                     {% if current_user_role in ['admin', 'project_manager'] and sprint.status != 'closed' %}
                         <form method="POST" action="{{ url_for('bug.issue_sprint', bug_id=issue.id) }}" class="assign-sprint-form">
@@ -389,7 +390,7 @@
 {% for issue in backlog_issues %}
     <div class="backlog-issue-row" data-id="{{ issue.id }}">
         <span class="backlog-issue-type-icon">
-            {% if issue.issue_type == 'Bug' %}🔴{% elif issue.issue_type == 'Story' %}🟢{% elif issue.issue_type == 'Task' %}🟣{% elif issue.issue_type == 'Epic' %}⚡{% else %}⎋{% endif %}
+            {{ render_type_icon(issue.issue_type, 13) }}
         </span>
         <span class="backlog-issue-key">{{ issue.issue_key }}</span>
         <a class="backlog-issue-title" href="{{ url_for('bug.bug_details', bug_id=issue.id) }}">{{ issue.title }}</a>
@@ -397,7 +398,7 @@
             <span class="backlog-issue-points" title="Story points">{{ issue.story_points }}</span>
         {% endif %}
         <span class="backlog-issue-priority">
-            {% if issue.priority in ['Urgent', 'Highest'] %}🔺{% elif issue.priority == 'High' %}⬆️{% elif issue.priority == 'Medium' %}🟰{% elif issue.priority == 'Low' %}⬇️{% else %}🔽{% endif %}
+            {{ render_priority_icon(issue.priority, 13) }}
         </span>
         {% if current_user_role in ['admin', 'project_manager'] and sprints|selectattr('status', 'in', ['active', 'future'])|list %}
             <form method="POST" action="{{ url_for('bug.issue_sprint', bug_id=issue.id) }}" class="assign-sprint-form">

@@ -123,6 +123,187 @@ def run_migrations(cursor):
     if not column_exists(cursor, "bugs", "due_date"):
         cursor.execute("ALTER TABLE bugs ADD COLUMN due_date DATE NULL AFTER story_points")
 
+    if not table_exists(cursor, "saved_filters"):
+        cursor.execute(
+            """
+            CREATE TABLE saved_filters (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                organization_id INT NOT NULL,
+                name VARCHAR(120) NOT NULL,
+                filter_data JSON NOT NULL,
+                is_shared TINYINT(1) NOT NULL DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_saved_filters_user (user_id, organization_id),
+                CONSTRAINT fk_saved_filters_user
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                CONSTRAINT fk_saved_filters_organization
+                    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
+            )
+            """
+        )
+
+    if not table_exists(cursor, "versions"):
+        cursor.execute(
+            """
+            CREATE TABLE versions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                organization_id INT NOT NULL,
+                project_id INT NOT NULL,
+                name VARCHAR(120) NOT NULL,
+                description TEXT,
+                release_date DATE NULL,
+                status ENUM('unreleased', 'released', 'archived') NOT NULL DEFAULT 'unreleased',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uq_versions_project_name (project_id, name),
+                INDEX idx_versions_organization (organization_id),
+                INDEX idx_versions_project (project_id),
+                CONSTRAINT fk_versions_organization
+                    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+                CONSTRAINT fk_versions_project
+                    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+            )
+            """
+        )
+    if not column_exists(cursor, "bugs", "fix_version_id"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN fix_version_id INT NULL AFTER sprint_id")
+
+    if not table_exists(cursor, "time_entries"):
+        cursor.execute(
+            """
+            CREATE TABLE time_entries (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                bug_id INT NOT NULL,
+                user_id INT NOT NULL,
+                hours_spent DECIMAL(10,2) NOT NULL,
+                description TEXT,
+                logged_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_time_entries_bug (bug_id),
+                INDEX idx_time_entries_user (user_id),
+                CONSTRAINT fk_time_entries_bug
+                    FOREIGN KEY (bug_id) REFERENCES bugs(id) ON DELETE CASCADE,
+                CONSTRAINT fk_time_entries_user
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+            """
+        )
+    if not column_exists(cursor, "bugs", "time_estimate"):
+        cursor.execute(
+            "ALTER TABLE bugs ADD COLUMN time_estimate DECIMAL(10,2) NULL AFTER due_date"
+        )
+    if not column_exists(cursor, "bugs", "time_remaining"):
+        cursor.execute(
+            "ALTER TABLE bugs ADD COLUMN time_remaining DECIMAL(10,2) NULL AFTER time_estimate"
+        )
+
+    if not table_exists(cursor, "dashboard_widgets"):
+        cursor.execute(
+            """
+            CREATE TABLE dashboard_widgets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                organization_id INT NOT NULL,
+                user_id INT NULL,
+                widget_type VARCHAR(50) NOT NULL,
+                title VARCHAR(120) NOT NULL,
+                config JSON DEFAULT NULL,
+                position INT NOT NULL DEFAULT 0,
+                width ENUM('full', 'half', 'third') NOT NULL DEFAULT 'full',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_dw_org (organization_id),
+                INDEX idx_dw_user (user_id),
+                CONSTRAINT fk_dw_org
+                    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+                CONSTRAINT fk_dw_user
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+            """
+        )
+
+    if not table_exists(cursor, "automation_rules"):
+        cursor.execute(
+            """
+            CREATE TABLE automation_rules (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                organization_id INT NOT NULL,
+                project_id INT NULL,
+                name VARCHAR(120) NOT NULL,
+                trigger_event ENUM('issue_created', 'status_changed', 'field_updated') NOT NULL,
+                conditions JSON DEFAULT NULL,
+                actions JSON NOT NULL,
+                enabled TINYINT(1) NOT NULL DEFAULT 1,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_ar_org (organization_id),
+                INDEX idx_ar_project (project_id),
+                INDEX idx_ar_trigger (trigger_event),
+                CONSTRAINT fk_ar_org
+                    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+                CONSTRAINT fk_ar_project
+                    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+            )
+            """
+        )
+
+    if not table_exists(cursor, "custom_field_definitions"):
+        cursor.execute(
+            """
+            CREATE TABLE custom_field_definitions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                organization_id INT NOT NULL,
+                project_id INT NOT NULL,
+                name VARCHAR(100) NOT NULL,
+                field_type ENUM('text', 'number', 'date', 'dropdown', 'checkbox') NOT NULL,
+                options JSON DEFAULT NULL,
+                required TINYINT(1) NOT NULL DEFAULT 0,
+                display_order INT NOT NULL DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_cfd_org (organization_id),
+                INDEX idx_cfd_project (project_id),
+                CONSTRAINT fk_cfd_org
+                    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+                CONSTRAINT fk_cfd_project
+                    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+            )
+            """
+        )
+    if not table_exists(cursor, "custom_field_values"):
+        cursor.execute(
+            """
+            CREATE TABLE custom_field_values (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                bug_id INT NOT NULL,
+                field_id INT NOT NULL,
+                value TEXT,
+                UNIQUE KEY uq_cfv_bug_field (bug_id, field_id),
+                INDEX idx_cfv_bug (bug_id),
+                INDEX idx_cfv_field (field_id),
+                CONSTRAINT fk_cfv_bug
+                    FOREIGN KEY (bug_id) REFERENCES bugs(id) ON DELETE CASCADE,
+                CONSTRAINT fk_cfv_field
+                    FOREIGN KEY (field_id) REFERENCES custom_field_definitions(id) ON DELETE CASCADE
+            )
+            """
+        )
+
+    if not table_exists(cursor, "issue_links"):
+        cursor.execute(
+            """
+            CREATE TABLE issue_links (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                bug_id_a INT NOT NULL,
+                bug_id_b INT NOT NULL,
+                link_type ENUM('blocks', 'relates_to', 'duplicates', 'clones') NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uq_issue_links_pair (bug_id_a, bug_id_b, link_type),
+                INDEX idx_issue_links_a (bug_id_a),
+                INDEX idx_issue_links_b (bug_id_b),
+                CONSTRAINT fk_issue_links_a
+                    FOREIGN KEY (bug_id_a) REFERENCES bugs(id) ON DELETE CASCADE,
+                CONSTRAINT fk_issue_links_b
+                    FOREIGN KEY (bug_id_b) REFERENCES bugs(id) ON DELETE CASCADE
+            )
+            """
+        )
+
     if not table_exists(cursor, "sprints"):
         cursor.execute(
             """

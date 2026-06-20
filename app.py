@@ -6,9 +6,16 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config, DatabaseUnavailable, db_cursor
 from routes.admin_routes import admin_bp
 from routes.auth_routes import auth_bp
+from routes.automation_routes import register_automation_routes
 from routes.bug_blueprint import bug_bp
 from routes.bug_routes import register_bug_routes
+from routes.custom_field_routes import register_custom_field_routes
+from routes.dashboard_routes import register_dashboard_routes
+from routes.link_routes import register_link_routes
+from routes.search_routes import register_search_routes
 from routes.sprint_routes import register_sprint_routes
+from routes.time_routes import register_time_routes
+from routes.version_routes import register_version_routes
 from routes.workflow_routes import register_workflow_routes
 from routes.report_routes import report_bp
 from routes.project_routes import project_bp
@@ -34,8 +41,15 @@ def create_app():
     app.before_request(validate_csrf)
     app.after_request(set_security_headers)
 
+    register_automation_routes(bug_bp)
     register_bug_routes(bug_bp)
+    register_custom_field_routes(bug_bp)
+    register_dashboard_routes(bug_bp)
+    register_link_routes(bug_bp)
+    register_search_routes(bug_bp)
     register_sprint_routes(bug_bp)
+    register_time_routes(bug_bp)
+    register_version_routes(bug_bp)
     register_workflow_routes(bug_bp)
 
     app.register_blueprint(auth_bp)
