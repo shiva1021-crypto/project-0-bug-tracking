@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<section class="form-card compact">
+    <h1>Login</h1>
+    <form method="POST" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" autocomplete="email" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" autocomplete="current-password" required>
+
+        <button type="submit">Login</button>
+    </form>
+    <p class="muted">New here? <a href="{{ url_for('auth.register') }}">Create an account</a>.</p>
+</section>
+{% endblock %}

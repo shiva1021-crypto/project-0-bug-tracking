@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Report Bug - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<section class="form-card">
+    <h1>Report New Bug</h1>
+    <form method="POST" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <label for="title">Bug Title</label>
+        <input id="title" type="text" name="title" maxlength="150" required>
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" required></textarea>
+
+        <label for="reproduction_steps">Reproduction Steps</label>
+        <textarea id="reproduction_steps" name="reproduction_steps"></textarea>
+
+        <div class="two-column">
+            <div>
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    {% for category in categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="external_issue_url">External Issue URL</label>
+                <input id="external_issue_url" type="url" name="external_issue_url" placeholder="https://github.com/...">
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div>
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority" required>
+                    {% for priority in priorities %}
+                        <option value="{{ priority }}">{{ priority }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="severity">Severity</label>
+                <select id="severity" name="severity" required>
+                    {% for severity in severities %}
+                        <option value="{{ severity }}">{{ severity }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <label for="screenshot">Screenshot</label>
+        <input id="screenshot" type="file" name="screenshot" accept="image/png,image/jpeg,image/gif,image/webp">
+
+        <button type="submit">Submit Bug</button>
+    </form>
+</section>
+{% endblock %}

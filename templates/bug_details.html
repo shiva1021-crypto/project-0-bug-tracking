@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Bug #{{ bug.id }} - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">Bug #{{ bug.id }}</p>
+        <h1>{{ bug.title }}</h1>
+    </div>
+    {% if current_user_role in ['admin', 'project_manager'] or bug.reporter_id == current_user_id %}
+        <a class="button button-secondary" href="{{ url_for('bug.edit_bug', bug_id=bug.id) }}">Edit Bug</a>
+    {% endif %}
+</div>
+
+<section class="details-layout">
+    <article class="panel details-card">
+        <div class="meta-grid">
+            <div><span>Priority</span><strong>{{ bug.priority }}</strong></div>
+            <div><span>Severity</span><strong>{{ bug.severity }}</strong></div>
+            <div><span>Status</span><strong>{{ bug.status }}</strong></div>
+            <div><span>Assigned</span><strong>{{ bug.developer_name or "Not Assigned" }}</strong></div>
+            <div><span>Category</span><strong>{{ bug.category or "General" }}</strong></div>
+        </div>
+
+        <h2>Description</h2>
+        <p>{{ bug.description }}</p>
+
+        <h2>Reproduction Steps</h2>
+        <p>{{ bug.reproduction_steps or "No reproduction steps provided." }}</p>
+
+        <p class="muted">Reported by {{ bug.reporter_name }} on {{ bug.created_at }}</p>
+
+        {% if bug.external_issue_url %}
+            <p><strong>External Issue:</strong> <a href="{{ bug.external_issue_url }}" target="_blank" rel="noopener noreferrer">{{ bug.external_issue_url }}</a></p>
+        {% endif %}
+
+        {% if bug.screenshot_path %}
+            <h2>Screenshot</h2>
+            <img class="screenshot" src="{{ url_for('uploaded_file', filename=bug.screenshot_path) }}" alt="Bug screenshot">
+        {% endif %}
+    </article>
+
+    <aside class="side-panel">
+        {% if current_user_role in ['admin', 'project_manager'] %}
+            <form class="panel" method="POST" action="{{ url_for('bug.assign_bug', bug_id=bug.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <h2>Assign Developer</h2>
+                <label for="developer_id">Developer</label>
+                <select id="developer_id" name="developer_id">
+                    <option value="">Not Assigned</option>
+                    {% for developer in developers %}
+                        <option value="{{ developer.id }}" {% if bug.assigned_to == developer.id %}selected{% endif %}>{{ developer.full_name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Update Assignment</button>
+            </form>
+        {% endif %}
+
+        {% if can_update_status %}
+            <form class="panel" method="POST" action="{{ url_for('bug.update_status', bug_id=bug.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <h2>Update Status</h2>
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    {% for status in statuses %}
+                        <option value="{{ status }}" {% if bug.status == status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Save Status</button>
+            </form>
+        {% elif current_user_role == 'developer' %}
+            <div class="panel">
+                <h2>Status Locked</h2>
+                <p class="muted">Only the developer assigned to this bug can update its status.</p>
+            </div>
+        {% endif %}
+    </aside>
+</section>
+
+<section class="details-layout lower">
+    <article class="panel">
+        <h2>Comments</h2>
+        <form method="POST" action="{{ url_for('bug.add_comment', bug_id=bug.id) }}" novalidate>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <textarea name="comment" placeholder="Add a comment" required></textarea>
+            <button type="submit">Add Comment</button>
+        </form>
+
+        {% for comment in comments %}
+            <div class="comment-box">
+                <strong>{{ comment.full_name }}</strong>
+                <p>{{ comment.comment }}</p>
+                <small>{{ comment.created_at }}</small>
+            </div>
+        {% else %}
+            <p class="empty">No comments yet.</p>
+        {% endfor %}
+    </article>
+
+    <article class="panel">
+        <h2>Audit Trail</h2>
+        {% for item in history %}
+            <div class="history-item">
+                <strong>{{ item.change_note or "Bug updated" }}</strong>
+                <p>
+                    {{ item.changed_by_name }}
+                    {% if item.old_status or item.new_status %}
+                        changed status from {{ item.old_status or "None" }} to {{ item.new_status or "None" }}.
+                    {% endif %}
+                    {% if item.old_developer_name or item.new_developer_name %}
+                        Assignment: {{ item.old_developer_name or "Not Assigned" }} to {{ item.new_developer_name or "Not Assigned" }}.
+                    {% endif %}
+                </p>
+                <small>{{ item.changed_at }}</small>
+            </div>
+        {% else %}
+            <p class="empty">No history available.</p>
+        {% endfor %}
+    </article>
+</section>
+{% endblock %}

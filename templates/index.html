@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Localhost client project</p>
+        <h1>Software Bug Tracking and Reporting Tool</h1>
+        <p class="hero-copy">
+            Report defects, assign them to developers, track status changes, discuss fixes, and generate filtered reports from one clean Flask dashboard.
+        </p>
+        <div class="action-row">
+            {% if current_user_id %}
+                <a class="button" href="{{ url_for('bug.dashboard') }}">Open Dashboard</a>
+            {% else %}
+                <a class="button" href="{{ url_for('auth.login') }}">Login</a>
+                <a class="button button-secondary" href="{{ url_for('auth.register') }}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-panel">
+        <div class="mini-stat">
+            <span>Roles</span>
+            <strong>4</strong>
+        </div>
+        <div class="mini-stat">
+            <span>Workflow</span>
+            <strong>Open to Closed</strong>
+        </div>
+        <div class="mini-stat">
+            <span>Reports</span>
+            <strong>CSV Ready</strong>
+        </div>
+    </div>
+</section>
+{% endblock %}

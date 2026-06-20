@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.full_name }} - Profile{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">User Profile</p>
+        <h1>{{ profile_user.full_name }}</h1>
+    </div>
+    {% if current_user_id == profile_user.id %}
+        <a class="button button-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
+    {% endif %}
+</div>
+
+<section class="profile-layout">
+    <aside class="panel profile-card">
+        <div class="profile-avatar">{{ profile_user.full_name[:1] }}</div>
+        <h2>{{ profile_user.full_name }}</h2>
+        <p class="muted">{{ profile_user.role.replace("_", " ").title() }}</p>
+
+        <dl class="profile-list">
+            <div>
+                <dt>User ID</dt>
+                <dd>#{{ profile_user.id }}</dd>
+            </div>
+            {% if can_view_email %}
+                <div>
+                    <dt>Email</dt>
+                    <dd>{{ profile_user.email }}</dd>
+                </div>
+            {% endif %}
+            <div>
+                <dt>Joined</dt>
+                <dd>{{ profile_user.created_at }}</dd>
+            </div>
+        </dl>
+    </aside>
+
+    <div class="profile-main">
+        <section class="stats-grid profile-stats">
+            <article class="stat-card">
+                <span>Reported Bugs</span>
+                <strong>{{ stats.reported_count }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Assigned Bugs</span>
+                <strong>{{ stats.assigned_count }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Active Assigned</span>
+                <strong>{{ stats.active_assigned_count }}</strong>
+            </article>
+            <article class="stat-card">
+                <span>Comments</span>
+                <strong>{{ stats.comment_count }}</strong>
+            </article>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <h2>Recently Reported Bugs</h2>
+                <a href="{{ url_for('bug.view_bugs') }}">View bugs</a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bug in reported_bugs %}
+                            <tr>
+                                <td>#{{ bug.id }}</td>
+                                <td><a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">{{ bug.title }}</a></td>
+                                <td><span class="badge">{{ bug.priority }}</span></td>
+                                <td><span class="badge severity">{{ bug.severity }}</span></td>
+                                <td><span class="status">{{ bug.status }}</span></td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="empty">No reported bugs yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <h2>Recently Assigned Bugs</h2>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bug in assigned_bugs %}
+                            <tr>
+                                <td>#{{ bug.id }}</td>
+                                <td><a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">{{ bug.title }}</a></td>
+                                <td><span class="badge">{{ bug.priority }}</span></td>
+                                <td><span class="badge severity">{{ bug.severity }}</span></td>
+                                <td><span class="status">{{ bug.status }}</span></td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="empty">No assigned bugs yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <h2>Recent Comments</h2>
+            </div>
+            {% for comment in recent_comments %}
+                <div class="comment-box">
+                    <strong><a href="{{ url_for('bug.bug_details', bug_id=comment.bug_id) }}">{{ comment.bug_title }}</a></strong>
+                    <p>{{ comment.comment }}</p>
+                    <small>{{ comment.created_at }}</small>
+                </div>
+            {% else %}
+                <p class="empty">No comments yet.</p>
+            {% endfor %}
+        </section>
+    </div>
+</section>
+{% endblock %}

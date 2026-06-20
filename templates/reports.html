@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">Reporting</p>
+        <h1>Bug Reports</h1>
+    </div>
+    <div class="action-row">
+        <button class="button button-secondary print-report" type="button">Export PDF</button>
+        <a class="button button-secondary" href="{{ export_url }}">Export CSV</a>
+    </div>
+</div>
+
+<section class="stats-grid compact-grid">
+    {% for item in status_counts %}
+        <article class="stat-card">
+            <span>{{ item.status }}</span>
+            <strong>{{ item.total }}</strong>
+        </article>
+    {% endfor %}
+    {% for item in priority_counts %}
+        <article class="stat-card">
+            <span>{{ item.priority }} Priority</span>
+            <strong>{{ item.total }}</strong>
+        </article>
+    {% endfor %}
+</section>
+
+<section class="chart-grid">
+    <article class="panel">
+        <h2>Status Chart</h2>
+        {% for item in status_chart %}
+            <div class="chart-row">
+                <div class="chart-label">
+                    <span>{{ item.label }}</span>
+                    <strong>{{ item.total }}</strong>
+                </div>
+                <div class="chart-track"><span style="width: {{ item.percent }}%"></span></div>
+            </div>
+        {% else %}
+            <p class="empty">No status data available.</p>
+        {% endfor %}
+    </article>
+    <article class="panel">
+        <h2>Priority Chart</h2>
+        {% for item in priority_chart %}
+            <div class="chart-row">
+                <div class="chart-label">
+                    <span>{{ item.label }}</span>
+                    <strong>{{ item.total }}</strong>
+                </div>
+                <div class="chart-track"><span style="width: {{ item.percent }}%"></span></div>
+            </div>
+        {% else %}
+            <p class="empty">No priority data available.</p>
+        {% endfor %}
+    </article>
+    <article class="panel">
+        <h2>Category Analytics</h2>
+        {% for item in category_chart %}
+            <div class="chart-row">
+                <div class="chart-label">
+                    <span>{{ item.label }}</span>
+                    <strong>{{ item.total }}</strong>
+                </div>
+                <div class="chart-track"><span style="width: {{ item.percent }}%"></span></div>
+            </div>
+        {% else %}
+            <p class="empty">No category data available.</p>
+        {% endfor %}
+    </article>
+</section>
+
+<form method="GET" class="filter-box report-filter">
+    <select name="status">
+        <option value="">All Status</option>
+        {% for status in statuses %}
+            <option value="{{ status }}" {% if filters.get('status') == status %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+    </select>
+    <select name="priority">
+        <option value="">All Priority</option>
+        {% for priority in priorities %}
+            <option value="{{ priority }}" {% if filters.get('priority') == priority %}selected{% endif %}>{{ priority }}</option>
+        {% endfor %}
+    </select>
+    <select name="severity">
+        <option value="">All Severity</option>
+        {% for severity in severities %}
+            <option value="{{ severity }}" {% if filters.get('severity') == severity %}selected{% endif %}>{{ severity }}</option>
+        {% endfor %}
+    </select>
+    <input type="date" name="start_date" value="{{ filters.get('start_date', '') }}">
+    <input type="date" name="end_date" value="{{ filters.get('end_date', '') }}">
+    <button type="submit">Generate Report</button>
+</form>
+
+<section class="panel">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bug</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Severity</th>
+                    <th>Reporter</th>
+                    <th>Assigned</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bug in bugs %}
+                    <tr>
+                        <td>#{{ bug.id }}</td>
+                        <td>{{ bug.title }}</td>
+                        <td>{{ bug.category }}</td>
+                        <td><span class="status">{{ bug.status }}</span></td>
+                        <td>{{ bug.priority }}</td>
+                        <td>{{ bug.severity }}</td>
+                        <td>{{ bug.reporter_name }}</td>
+                        <td>{{ bug.developer_name or "Not Assigned" }}</td>
+                        <td>{{ bug.created_at }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="9" class="empty">No report rows match the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% if pagination and pagination.total_pages > 1 %}
+    <nav class="pagination" aria-label="Report pages">
+        {% if pagination.has_previous %}
+            <a href="{{ url_for('report.reports', page=pagination.page - 1, **page_args) }}">Previous</a>
+        {% endif %}
+        <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} bugs</span>
+        {% if pagination.has_next %}
+            <a href="{{ url_for('report.reports', page=pagination.page + 1, **page_args) }}">Next</a>
+        {% endif %}
+    </nav>
+{% endif %}
+{% endblock %}

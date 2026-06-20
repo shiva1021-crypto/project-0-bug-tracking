@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bug Tracking Tool{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a class="brand" href="{{ url_for('index') }}">Bug Tracking Tool</a>
+        <button class="nav-toggle" type="button" aria-label="Toggle navigation">Menu</button>
+        <div class="nav-links">
+            {% if current_user_id %}
+                <a href="{{ url_for('bug.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('bug.view_bugs') }}">Bugs</a>
+                {% if current_user_role in ['tester', 'admin', 'project_manager'] %}
+                    <a href="{{ url_for('bug.add_bug') }}">Report Bug</a>
+                {% endif %}
+                {% if current_user_role in ['admin', 'project_manager'] %}
+                    <a href="{{ url_for('report.reports') }}">Reports</a>
+                {% endif %}
+                {% if current_user_role == 'admin' %}
+                    <a href="{{ url_for('admin.users') }}">Users</a>
+                {% endif %}
+                <button class="theme-toggle" type="button" aria-label="Toggle dark mode">Theme</button>
+                <span class="nav-user">{{ current_organization_name }}</span>
+                <a class="nav-user" href="{{ url_for('auth.profile') }}">{{ current_user_name }}</a>
+                <form class="nav-logout" method="post" action="{{ url_for('auth.logout') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
+                <a href="{{ url_for('auth.register') }}">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alerts">
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

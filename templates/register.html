@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Bug Tracking Tool{% endblock %}
+
+{% block content %}
+<section class="form-card compact">
+    <h1>Register</h1>
+    <form method="POST" novalidate>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <label for="full_name">Full Name</label>
+        <input id="full_name" type="text" name="full_name" autocomplete="name" required>
+
+        <label for="email">Email</label>
+        <input id="email" type="email" name="email" autocomplete="email" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" autocomplete="new-password" minlength="8" required>
+
+        <label for="organization_name">Organization</label>
+        <input id="organization_name" type="text" name="organization_name" autocomplete="organization" maxlength="120" required>
+
+        <p class="muted">The first user in an organization becomes admin. Later users join as testers until an admin changes their role.</p>
+
+        <button type="submit">Register</button>
+    </form>
+</section>
+{% endblock %}

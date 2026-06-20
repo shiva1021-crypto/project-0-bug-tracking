@@ -1,0 +1,235 @@
+{
+  "communities": {
+    "0": [
+      "app",
+      "app_create_app",
+      "config",
+      "config_config",
+      "config_databaseunavailable",
+      "config_databaseunavailable_init",
+      "config_db_config",
+      "config_get_server_connection",
+      "run_dev",
+      "runtimeerror",
+      "utils_security",
+      "utils_security_csrf_token",
+      "utils_security_set_security_headers",
+      "utils_security_validate_csrf",
+      "wsgi"
+    ],
+    "1": [
+      "config_get_db_connection",
+      "models_bug_model",
+      "models_bug_model_get_bug_by_id",
+      "models_comment_model",
+      "models_comment_model_get_comments_for_bug",
+      "models_user_model",
+      "models_user_model_get_developers",
+      "models_user_model_get_user_by_id",
+      "routes_admin_routes",
+      "routes_admin_routes_create_user",
+      "routes_admin_routes_update_user_role",
+      "routes_admin_routes_users",
+      "routes_bug_routes_add_comment",
+      "routes_bug_routes_dashboard"
+    ],
+    "2": [
+      "routes_bug_routes",
+      "routes_bug_routes_add_bug",
+      "routes_bug_routes_allowed_file",
+      "routes_bug_routes_assign_bug",
+      "routes_bug_routes_bug_details",
+      "routes_bug_routes_edit_bug",
+      "routes_bug_routes_get_developers",
+      "routes_bug_routes_save_screenshot",
+      "routes_bug_routes_update_status",
+      "routes_bug_routes_view_bugs",
+      "utils_decorators_can_update_bug_status",
+      "utils_notifications",
+      "utils_notifications_send_email"
+    ],
+    "3": [
+      "config_db_cursor",
+      "routes_auth_routes",
+      "routes_auth_routes_get_profile_data",
+      "routes_auth_routes_login",
+      "routes_auth_routes_logout",
+      "routes_auth_routes_profile",
+      "routes_auth_routes_register",
+      "routes_auth_routes_user_profile"
+    ],
+    "4": [
+      "routes_report_routes",
+      "routes_report_routes_build_report_query",
+      "routes_report_routes_reports",
+      "routes_report_routes_with_percent",
+      "utils_decorators",
+      "utils_decorators_has_valid_session",
+      "utils_decorators_login_required",
+      "utils_decorators_role_required"
+    ],
+    "5": [
+      "init_db",
+      "init_db_column_exists",
+      "init_db_main",
+      "init_db_run_if_needed",
+      "init_db_run_migrations",
+      "init_db_split_sql_statements"
+    ],
+    "6": [
+      "check_db",
+      "check_db_main"
+    ],
+    "7": [
+      "js_script"
+    ],
+    "8": [
+      "models_init"
+    ],
+    "9": [
+      "routes_init"
+    ],
+    "10": [
+      "utils_init"
+    ]
+  },
+  "cohesion": {
+    "0": 0.2,
+    "1": 0.21978021978021978,
+    "2": 0.28205128205128205,
+    "3": 0.32142857142857145,
+    "4": 0.35714285714285715,
+    "5": 0.6666666666666666,
+    "6": 1.0,
+    "7": 1.0,
+    "8": 1.0,
+    "9": 1.0,
+    "10": 1.0
+  },
+  "gods": [
+    {
+      "id": "config_get_db_connection",
+      "label": "get_db_connection()",
+      "degree": 28
+    },
+    {
+      "id": "config_databaseunavailable",
+      "label": "DatabaseUnavailable",
+      "degree": 6
+    },
+    {
+      "id": "config_db_cursor",
+      "label": "db_cursor()",
+      "degree": 6
+    },
+    {
+      "id": "init_db_run_migrations",
+      "label": "run_migrations()",
+      "degree": 4
+    },
+    {
+      "id": "init_db_main",
+      "label": "main()",
+      "degree": 4
+    },
+    {
+      "id": "routes_bug_routes_save_screenshot",
+      "label": "save_screenshot()",
+      "degree": 4
+    },
+    {
+      "id": "routes_bug_routes_bug_details",
+      "label": "bug_details()",
+      "degree": 4
+    },
+    {
+      "id": "routes_bug_routes_update_status",
+      "label": "update_status()",
+      "degree": 4
+    },
+    {
+      "id": "routes_report_routes_reports",
+      "label": "reports()",
+      "degree": 4
+    },
+    {
+      "id": "utils_decorators_role_required",
+      "label": "role_required()",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "login()",
+      "target": "get_db_connection()",
+      "source_files": [
+        "routes/auth_routes.py",
+        "config.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; bridges separate communities; peripheral node `login()` unexpectedly reaches hub `get_db_connection()`"
+    },
+    {
+      "source": "get_bug_by_id()",
+      "target": "get_db_connection()",
+      "source_files": [
+        "models/bug_model.py",
+        "config.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; peripheral node `get_bug_by_id()` unexpectedly reaches hub `get_db_connection()`"
+    },
+    {
+      "source": "get_comments_for_bug()",
+      "target": "get_db_connection()",
+      "source_files": [
+        "models/comment_model.py",
+        "config.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; peripheral node `get_comments_for_bug()` unexpectedly reaches hub `get_db_connection()`"
+    },
+    {
+      "source": "get_developers()",
+      "target": "get_db_connection()",
+      "source_files": [
+        "models/user_model.py",
+        "config.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; peripheral node `get_developers()` unexpectedly reaches hub `get_db_connection()`"
+    },
+    {
+      "source": "get_user_by_id()",
+      "target": "get_db_connection()",
+      "source_files": [
+        "models/user_model.py",
+        "config.py"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "connects across different repos/directories; peripheral node `get_user_by_id()` unexpectedly reaches hub `get_db_connection()`"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `get_db_connection()` connect `Database Access & Admin` to `Application Security & Config`, `Bug Workflow`, `Authentication & Profiles`, `Reports & Authorization`?",
+      "why": "High betweenness centrality (0.264) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `DatabaseUnavailable` connect `Application Security & Config` to `Database Access & Admin`?",
+      "why": "High betweenness centrality (0.053) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `db_cursor()` connect `Authentication & Profiles` to `Application Security & Config`, `Database Access & Admin`, `Bug Workflow`?",
+      "why": "High betweenness centrality (0.017) - this node is a cross-community bridge."
+    }
+  ]
+}
