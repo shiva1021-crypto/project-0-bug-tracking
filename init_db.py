@@ -30,6 +30,18 @@ def column_exists(cursor, table_name, column_name):
     return cursor.fetchone()[0] > 0
 
 
+def table_exists(cursor, table_name):
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM information_schema.TABLES
+        WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s
+        """,
+        (os.getenv("DB_NAME", "bug_tracking_db"), table_name),
+    )
+    return cursor.fetchone()[0] > 0
+
+
 def run_if_needed(cursor, statement):
     try:
         cursor.execute(statement)
@@ -110,6 +122,32 @@ def run_migrations(cursor):
         cursor.execute("ALTER TABLE bugs ADD COLUMN story_points INT NULL AFTER labels")
     if not column_exists(cursor, "bugs", "due_date"):
         cursor.execute("ALTER TABLE bugs ADD COLUMN due_date DATE NULL AFTER story_points")
+
+    if not table_exists(cursor, "sprints"):
+        cursor.execute(
+            """
+            CREATE TABLE sprints (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                organization_id INT NOT NULL,
+                project_id INT NOT NULL,
+                name VARCHAR(120) NOT NULL,
+                goal TEXT,
+                start_date DATE NULL,
+                end_date DATE NULL,
+                status ENUM('active', 'closed', 'future') NOT NULL DEFAULT 'future',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_sprints_organization (organization_id),
+                INDEX idx_sprints_project (project_id),
+                INDEX idx_sprints_status (status),
+                CONSTRAINT fk_sprints_organization
+                    FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+                CONSTRAINT fk_sprints_project
+                    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+            )
+            """
+        )
+    if not column_exists(cursor, "bugs", "sprint_id"):
+        cursor.execute("ALTER TABLE bugs ADD COLUMN sprint_id INT NULL AFTER project_id")
 
     cursor.execute("SELECT id, name FROM organizations ORDER BY id")
     organizations = cursor.fetchall()

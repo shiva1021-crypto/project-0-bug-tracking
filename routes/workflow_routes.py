@@ -116,6 +116,7 @@ def register_workflow_routes(bp):
             return action_response(
                 "Issue status updated successfully.", "project.board",
                 project=request.form.get("project", ""),
+                sprint=request.form.get("sprint", ""),
             )
         return action_response(
             "Issue status updated successfully.", "bug.bug_details", bug_id=bug_id

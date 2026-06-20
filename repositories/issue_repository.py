@@ -24,23 +24,28 @@ def get_projects(cursor, organization_id):
     return cursor.fetchall()
 
 
-def _board_scope(organization_id, project_id):
+def _board_scope(organization_id, project_id, sprint_id=None):
     where = "WHERE bugs.organization_id = %s"
     params = [organization_id]
     if project_id is not None:
         where += " AND bugs.project_id = %s"
         params.append(project_id)
+    if sprint_id == "none":
+        where += " AND bugs.sprint_id IS NULL"
+    elif sprint_id and str(sprint_id).isdigit():
+        where += " AND bugs.sprint_id = %s"
+        params.append(int(sprint_id))
     return where, params
 
 
-def count_board_issues(cursor, organization_id, project_id):
-    where, params = _board_scope(organization_id, project_id)
+def count_board_issues(cursor, organization_id, project_id, sprint_id=None):
+    where, params = _board_scope(organization_id, project_id, sprint_id)
     cursor.execute(f"SELECT COUNT(*) AS total FROM bugs {where}", params)
     return cursor.fetchone()["total"]
 
 
-def get_board_issues(cursor, organization_id, project_id, limit, offset):
-    where, params = _board_scope(organization_id, project_id)
+def get_board_issues(cursor, organization_id, project_id, limit, offset, sprint_id=None):
+    where, params = _board_scope(organization_id, project_id, sprint_id)
 
     cursor.execute(
         f"""

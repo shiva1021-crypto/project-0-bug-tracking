@@ -21,6 +21,7 @@
                     <a href="{{ url_for('bug.dashboard') }}">Dashboard</a>
                     <a href="{{ url_for('project.projects') }}">Projects</a>
                     <a href="{{ url_for('bug.view_bugs') }}">Issues</a>
+                    <a href="{{ url_for('bug.backlog') }}">Backlog</a>
                     <a class="btn-create-issue" href="{{ url_for('bug.add_bug') }}">+ Create</a>
                 </nav>
                 {% endif %}
@@ -84,6 +85,12 @@
                                 <span class="sidebar-text">Issues List</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ url_for('bug.backlog') }}" class="{% if request.path == url_for('bug.backlog') %}active{% endif %}">
+                                <span class="sidebar-icon">📝</span>
+                                <span class="sidebar-text">Backlog</span>
+                            </a>
+                        </li>
                         {% if current_user_role in ['admin', 'project_manager'] %}
                         <li>
                             <a href="{{ url_for('report.reports') }}" class="{% if request.path == url_for('report.reports') %}active{% endif %}">
@@ -133,5 +140,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

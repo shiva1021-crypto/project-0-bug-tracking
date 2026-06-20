@@ -126,6 +126,25 @@ CREATE TABLE IF NOT EXISTS bugs (
         FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS sprints (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organization_id INT NOT NULL,
+    project_id INT NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    goal TEXT,
+    start_date DATE NULL,
+    end_date DATE NULL,
+    status ENUM('active', 'closed', 'future') NOT NULL DEFAULT 'future',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_sprints_organization (organization_id),
+    INDEX idx_sprints_project (project_id),
+    INDEX idx_sprints_status (status),
+    CONSTRAINT fk_sprints_organization
+        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_sprints_project
+        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS issue_watchers (
     bug_id INT NOT NULL,
     user_id INT NOT NULL,

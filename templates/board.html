@@ -288,6 +288,7 @@
     <a href="{{ url_for('bug.dashboard') }}">Summary</a>
     <a href="#" class="active">Board</a>
     <a href="{{ url_for('bug.view_bugs') }}">Issues</a>
+    <a href="{{ url_for('bug.backlog') }}">Backlog</a>
     <a href="{{ url_for('report.reports') }}">Reports</a>
     <a href="{{ url_for('admin.users') }}">Users</a>
     <a href="{{ url_for('auth.profile') }}">Profile</a>
@@ -304,11 +305,18 @@
         </div>
         
         <!-- Project dropdown filter -->
-        <form method="GET" class="board-filter-form" style="margin: 0; display: inline-block;">
+        <form method="GET" class="board-filter-form" style="margin: 0; display: inline-flex; gap: 8px; align-items: center;">
             <select name="project" aria-label="Filter board by project" class="board-filter-select">
                 <option value="">All Projects</option>
                 {% for project in projects %}
                     <option value="{{ project.id }}" {% if selected_project == project.id|string %}selected{% endif %}>{{ project.project_key }} · {{ project.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="sprint" aria-label="Filter by sprint" class="board-filter-select">
+                <option value="">All Sprints</option>
+                <option value="none" {% if request.args.get('sprint') == 'none' %}selected{% endif %}>Backlog (No Sprint)</option>
+                {% for sprint in sprints %}
+                    <option value="{{ sprint.id }}" {% if request.args.get('sprint') == sprint.id|string %}selected{% endif %}>{{ sprint.name }}</option>
                 {% endfor %}
             </select>
             <button class="button-secondary board-filter-submit" type="submit">Apply</button>
@@ -416,6 +424,7 @@
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="return_to" value="board">
                                 <input type="hidden" name="project" value="{{ selected_project }}">
+                                <input type="hidden" name="sprint" value="{{ request.args.get('sprint', '') }}">
                                 <div style="display: flex; gap: 4px; align-items: center; width: 100%;">
                                     <select name="status" aria-label="Update {{ issue.issue_key }} status" style="min-height: 24px; font-size: 11px; padding: 2px 4px; flex-grow: 1;">
                                         {% for option in statuses %}
@@ -437,11 +446,11 @@
 {% if pagination.total_pages > 1 %}
 <nav class="pagination" aria-label="Board pages">
     {% if pagination.has_previous %}
-        <a href="{{ url_for('project.board', project=selected_project, page=pagination.page - 1) }}">Previous</a>
+        <a href="{{ url_for('project.board', project=selected_project, sprint=request.args.get('sprint', ''), page=pagination.page - 1) }}">Previous</a>
     {% endif %}
     <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} issues</span>
     {% if pagination.has_next %}
-        <a href="{{ url_for('project.board', project=selected_project, page=pagination.page + 1) }}">Next</a>
+        <a href="{{ url_for('project.board', project=selected_project, sprint=request.args.get('sprint', ''), page=pagination.page + 1) }}">Next</a>
     {% endif %}
 </nav>
 {% endif %}

@@ -5,6 +5,7 @@ from mysql.connector import Error
 
 from config import get_db_connection
 from repositories.issue_repository import count_board_issues, get_board_issues, get_projects
+from repositories.sprint_repository import get_sprints
 from services.issue_service import STATUSES
 from utils.decorators import login_required
 from utils.pagination import pagination_values
@@ -74,16 +75,22 @@ def projects():
 @login_required
 def board():
     selected_project = request.args.get("project", "")
+    selected_sprint = request.args.get("sprint", "")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     projects = get_projects(cursor, session["organization_id"])
     project_id = int(selected_project) if selected_project.isdigit() else None
+    try:
+        sprints = get_sprints(cursor, session["organization_id"], project_id) if project_id else []
+    except Exception:
+        sprints = []
+    sprint_id = selected_sprint if selected_sprint else None
     page_size = current_app.config["BOARD_PAGE_SIZE"]
-    total = count_board_issues(cursor, session["organization_id"], project_id)
+    total = count_board_issues(cursor, session["organization_id"], project_id, sprint_id)
     pagination = pagination_values(request.args.get("page", 1), total, page_size)
     offset = (pagination["page"] - 1) * page_size
     issues = get_board_issues(
-        cursor, session["organization_id"], project_id, page_size, offset
+        cursor, session["organization_id"], project_id, page_size, offset, sprint_id
     )
     cursor.close()
     conn.close()
@@ -97,6 +104,7 @@ def board():
         columns=columns,
         statuses=STATUSES,
         projects=projects,
+        sprints=sprints,
         selected_project=selected_project,
         pagination=pagination,
     )
