@@ -42,6 +42,19 @@ def run_migrations(cursor):
     cursor.execute(f"USE {os.getenv('DB_NAME', 'bug_tracking_db')}")
     default_org_id = None
 
+    if not column_exists(cursor, "registration_requests", "verification_token_hash"):
+        cursor.execute(
+            "ALTER TABLE registration_requests ADD COLUMN verification_token_hash CHAR(64) NULL AFTER requester_ip"
+        )
+    if not column_exists(cursor, "registration_requests", "verified_at"):
+        cursor.execute(
+            "ALTER TABLE registration_requests ADD COLUMN verified_at DATETIME NULL AFTER verification_token_hash"
+        )
+    cursor.execute(
+        "ALTER TABLE registration_requests MODIFY requested_role "
+        "ENUM('admin', 'project_manager', 'developer', 'tester') NOT NULL DEFAULT 'tester'"
+    )
+
     if not column_exists(cursor, "users", "organization_id"):
         cursor.execute(
             "INSERT IGNORE INTO organizations (name) VALUES (%s)",

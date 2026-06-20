@@ -1,148 +1,165 @@
 {% extends "base.html" %}
 
-{% block title %}IssueFlow — Modern Project and Issue Tracking{% endblock %}
+{% block title %}IssueFlow — Modern Project & Issue Tracking{% endblock %}
 {% block body_class %}landing-page{% endblock %}
 
 {% block content %}
-<section class="landing-hero">
-    <div class="landing-hero-copy">
-        <div class="landing-kicker"><span></span> Modern work management for software teams</div>
-        <h1>Turn complex work into <em>clear momentum.</em></h1>
-        <p>
-            Plan projects, organize issues, coordinate developers, and move work from idea to done in one focused workspace built for modern software teams.
-        </p>
-        <div class="landing-actions">
-            {% if current_user_id %}
-                <a class="button landing-primary" href="{{ url_for('project.board') }}">Open your board <span>→</span></a>
-                <a class="button button-secondary" href="{{ url_for('bug.add_bug') }}">Create an issue</a>
-            {% else %}
-                <a class="button landing-primary" href="{{ url_for('auth.register') }}">Start your workspace <span>→</span></a>
-                <a class="button button-secondary" href="{{ url_for('auth.login') }}">Sign in</a>
-            {% endif %}
+<div class="landing-page-wrapper">
+    <!-- Hero Section -->
+    <section class="landing-hero">
+        <div class="landing-hero-copy">
+            <div class="eyebrow" style="color: var(--primary); font-weight: 800; font-size: 13px;">Modern software development</div>
+            <h1>Turn complex work into <em>clear momentum.</em></h1>
+            <p>
+                Plan projects, prioritize backlogs, coordinate developers, and track delivery from concept to deployment. All in one focused, lightning-fast workspace.
+            </p>
+            <div class="landing-actions">
+                {% if current_user_id %}
+                    <a class="button" href="{{ url_for('project.board') }}">Open Kanban board <span>→</span></a>
+                    <a class="button button-secondary" href="{{ url_for('bug.add_bug') }}">Create an issue</a>
+                {% else %}
+                    <a class="button" href="{{ url_for('auth.register') }}">Get IssueFlow free <span>→</span></a>
+                    <a class="button button-secondary" href="{{ url_for('auth.login') }}">Sign In</a>
+                {% endif %}
+            </div>
         </div>
-        <div class="landing-trust">
-            <span><i>✓</i> Organization isolated</span>
-            <span><i>✓</i> Role-based access</span>
-            <span><i>✓</i> Audit ready</span>
-        </div>
-    </div>
 
-    <div class="product-preview" aria-label="IssueFlow Kanban board preview">
-        <div class="preview-window-bar">
-            <div class="preview-dots"><span></span><span></span><span></span></div>
-            <div class="preview-address">issueflow / web-platform / board</div>
-            <span class="preview-online">Live</span>
-        </div>
-        <div class="preview-shell">
-            <aside class="preview-sidebar">
-                <div class="preview-logo">IF</div>
-                <span class="active"></span><span></span><span></span><span></span>
-            </aside>
-            <div class="preview-main">
-                <div class="preview-header">
-                    <div><small>WEB PLATFORM</small><strong>Sprint board</strong></div>
-                    <div class="preview-avatars"><b>AD</b><b>PM</b><b>DV</b></div>
-                </div>
-                <div class="preview-board">
-                    <div class="preview-column">
-                        <h3>TO DO <span>2</span></h3>
-                        <article><small>STORY · WEB-14</small><strong>Improve account onboarding</strong><div><i class="tag violet">design</i><b>5</b></div></article>
-                        <article><small>BUG · WEB-18</small><strong>Fix mobile navigation state</strong><div><i class="tag red">urgent</i><b>3</b></div></article>
+        <div class="product-preview" aria-label="IssueFlow Kanban board preview">
+            <div class="preview-window-bar">
+                <div class="preview-dots"><span></span><span></span><span></span></div>
+                <div class="preview-address">issueflow.com/workspace/board</div>
+            </div>
+            <div class="preview-shell">
+                <aside class="preview-sidebar">
+                    <div class="preview-logo">IF</div>
+                    <span class="active"></span>
+                    <span></span>
+                    <span></span>
+                </aside>
+                <div class="preview-main">
+                    <div class="preview-header">
+                        <div>
+                            <span class="eyebrow" style="font-size: 8px;">Sprint 1 board</span>
+                            <strong>Active Sprint</strong>
+                        </div>
+                        <div style="display: flex; gap: 4px;">
+                            <span class="user-avatar-initial" style="background:#DEEBFF; color:#0C66E4; width:20px; height:20px; font-size:9px;">AC</span>
+                            <span class="user-avatar-initial" style="background:#EAE6FF; color:#5E4DB2; width:20px; height:20px; font-size:9px;">NW</span>
+                            <span class="user-avatar-initial" style="background:#DFFCF0; color:#216E4E; width:20px; height:20px; font-size:9px;">LP</span>
+                        </div>
                     </div>
-                    <div class="preview-column">
-                        <h3>IN PROGRESS <span>2</span></h3>
-                        <article class="accent-card"><small>TASK · WEB-11</small><strong>Build project analytics</strong><div><i class="tag blue">backend</i><b>8</b></div></article>
-                        <article><small>STORY · WEB-16</small><strong>Design reporting workflow</strong><div><i class="tag green">reports</i><b>5</b></div></article>
-                    </div>
-                    <div class="preview-column preview-done">
-                        <h3>DONE <span>1</span></h3>
-                        <article><small>EPIC · WEB-2</small><strong>Secure team workspace</strong><div><i class="tag green">shipped</i><b>✓</b></div></article>
+                    <div class="preview-board">
+                        <div class="preview-column">
+                            <h3>To Do</h3>
+                            <article>
+                                <span class="issue-type-badge type-story" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">🟢</span> Story</span>
+                                <strong>WEB-101</strong>
+                                <p style="font-size: 10px; color: var(--text-subtle);">Refactor navigation grid</p>
+                            </article>
+                            <article>
+                                <span class="issue-type-badge type-bug" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">🔴</span> Bug</span>
+                                <strong>WEB-103</strong>
+                                <p style="font-size: 10px; color: var(--text-subtle);">Fix mobile layout shift</p>
+                            </article>
+                        </div>
+                        <div class="preview-column">
+                            <h3>In Progress</h3>
+                            <article style="border-left: 3px solid var(--primary);">
+                                <span class="issue-type-badge type-task" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">🔵</span> Task</span>
+                                <strong>API-204</strong>
+                                <p style="font-size: 10px; color: var(--text-subtle);">Build database schema</p>
+                            </article>
+                        </div>
+                        <div class="preview-column">
+                            <h3>Done</h3>
+                            <article style="opacity: 0.7;">
+                                <span class="issue-type-badge type-epic" style="font-size: 8px; padding: 1px 4px;"><span class="type-icon">⚡</span> Epic</span>
+                                <strong>MOB-401</strong>
+                                <p style="font-size: 10px; color: var(--text-subtle); text-decoration: line-through;">Release iOS application</p>
+                            </article>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="capability-strip" aria-label="Product capabilities">
-    <div><strong>5</strong><span>structured work types</span></div>
-    <div><strong>4</strong><span>workflow stages</span></div>
-    <div><strong>4</strong><span>permission roles</span></div>
-    <div><strong>1</strong><span>shared source of truth</span></div>
-</section>
-
-<section class="landing-section">
-    <div class="section-intro">
-        <p class="eyebrow">Everything stays connected</p>
-        <h2>A calmer way to run software work.</h2>
-        <p>Move beyond scattered chats and spreadsheets with a workflow that keeps planning, execution, and reporting together.</p>
-    </div>
-    <div class="feature-grid premium-grid">
-        <article class="landing-feature feature-wide feature-blue">
-            <div class="feature-icon">▦</div>
-            <div>
-                <span>PLAN VISUALLY</span>
-                <h3>Kanban that makes progress obvious</h3>
-                <p>See every issue by status, project, priority, estimate, and assignee. Developers can move assigned work through the secure workflow directly from the board.</p>
-                <a href="{{ url_for('project.board') if current_user_id else url_for('auth.login') }}">Explore the board →</a>
+    <!-- Populated test workspace -->
+    <section class="demo-workspace" aria-labelledby="demo-workspace-title">
+        <div class="demo-workspace-copy">
+            <span class="eyebrow">Ready for realistic testing</span>
+            <h2 id="demo-workspace-title">Explore a workspace that already feels active.</h2>
+            <p>
+                The Demo Organization includes enough connected data to test pagination,
+                permissions, dashboards, reports, issue hierarchy, assignments, comments,
+                watchers, and every Kanban state.
+            </p>
+            <div class="demo-workspace-actions">
+                <a class="button" href="{{ url_for('auth.login') }}">Open demo workspace</a>
+                {% if show_demo_credentials %}
+                    <span>Local demo credentials are printed by the seed command.</span>
+                {% endif %}
             </div>
-        </article>
-        <article class="landing-feature">
-            <div class="feature-icon icon-purple">◇</div>
-            <span>STRUCTURE WORK</span>
-            <h3>Projects and issue hierarchy</h3>
-            <p>Organize Epics, Stories, Tasks, Bugs, and Subtasks with readable keys and parent-child relationships.</p>
-        </article>
-        <article class="landing-feature">
-            <div class="feature-icon icon-green">◎</div>
-            <span>STAY ALIGNED</span>
-            <h3>Comments, watchers, and history</h3>
-            <p>Keep decisions next to the work, notify interested teammates, and preserve a dependable audit trail.</p>
-        </article>
-        <article class="landing-feature">
-            <div class="feature-icon icon-orange">↗</div>
-            <span>MAKE DECISIONS</span>
-            <h3>Reports teams can act on</h3>
-            <p>Filter by project, work type, status, priority, severity, and date—then export clean CSV data.</p>
-        </article>
-        <article class="landing-feature">
-            <div class="feature-icon icon-blue">⌁</div>
-            <span>WORK SAFELY</span>
-            <h3>Security built into the workflow</h3>
-            <p>Tenant isolation, refreshed permissions, protected evidence, CSRF defenses, and role-aware actions.</p>
-        </article>
-    </div>
-</section>
+        </div>
 
-<section class="workflow-showcase">
-    <div class="section-intro left">
-        <p class="eyebrow">From signal to shipped</p>
-        <h2>One workflow, shared by the whole team.</h2>
-    </div>
-    <div class="workflow-steps">
-        <article><b>01</b><div><h3>Capture</h3><p>Create structured issues with context, evidence, labels, dates, and estimates.</p></div></article>
-        <article><b>02</b><div><h3>Plan</h3><p>Group work into projects and hierarchy, then prioritize what matters most.</p></div></article>
-        <article><b>03</b><div><h3>Deliver</h3><p>Assign ownership and move work through a visible, permission-aware board.</p></div></article>
-        <article><b>04</b><div><h3>Learn</h3><p>Use history, dashboards, and reports to improve the next cycle.</p></div></article>
-    </div>
-</section>
+        <div class="demo-workspace-data">
+            <div class="demo-metrics">
+                <article><strong>6</strong><span>project spaces</span></article>
+                <article><strong>180+</strong><span>linked issues</span></article>
+                <article><strong>20</strong><span>team members</span></article>
+                <article><strong>500+</strong><span>issue comments</span></article>
+            </div>
+            <div class="demo-projects" aria-label="Seeded demo projects">
+                <span><b>WEB</b> Customer Web Platform</span>
+                <span><b>API</b> Core API Services</span>
+                <span><b>MOB</b> Mobile Applications</span>
+                <span><b>OPS</b> Platform Operations</span>
+                <span><b>DATA</b> Data and Analytics</span>
+                <span><b>DEMOOR</b> General Workspace</span>
+            </div>
+        </div>
+    </section>
 
-<section class="landing-cta">
-    <div>
-        <p class="eyebrow">Build with clarity</p>
-        <h2>Give your team one place to plan, track, and ship.</h2>
-        <p>Start with a project, create your first issue, and let the workflow do the organizing.</p>
-        {% if current_user_id %}
-            <a class="button" href="{{ url_for('project.projects') }}">View projects →</a>
-        {% else %}
-            <a class="button" href="{{ url_for('auth.register') }}">Create your workspace →</a>
-        {% endif %}
-    </div>
-</section>
+    <!-- Capabilities Grid -->
+    <section class="landing-section">
+        <div class="section-intro">
+            <h2>Streamlined management for software teams</h2>
+            <p>Everything you need to deliver high-quality code, without the clutter of traditional tools.</p>
+        </div>
+        <div class="premium-grid">
+            <article class="landing-feature feature-wide feature-blue">
+                <div class="feature-icon">📋</div>
+                <div>
+                    <span class="eyebrow" style="color: var(--primary);">Visual Board</span>
+                    <h3 style="margin-top: 4px;">Kanban board built for clarity</h3>
+                    <p style="margin-top: 8px;">
+                        Easily monitor and transition issues through your team's workflow. Filter by project, developer, priority, or severity in real time.
+                    </p>
+                </div>
+            </article>
+            <article class="landing-feature">
+                <div class="feature-icon">⚡</div>
+                <span class="eyebrow">Work Hierarchy</span>
+                <h3>Structured issues</h3>
+                <p>Track everything from broad Epics down to granular Stories, Tasks, Bugs, and Subtasks with readable tracking keys.</p>
+            </article>
+            <article class="landing-feature">
+                <div class="feature-icon">📈</div>
+                <span class="eyebrow">Analytics</span>
+                <h3>Real-time reporting</h3>
+                <p>Generate status charts, priority indicators, and category breakdowns. Export audit data to CSV at the click of a button.</p>
+            </article>
+        </div>
+    </section>
 
-<footer class="landing-footer">
-    <div class="footer-brand"><span>IF</span><strong>IssueFlow</strong></div>
-    <p>Modern issue tracking for focused software teams.</p>
-    <span>Flask · MySQL · Secure by design</span>
-</footer>
+    <!-- Marketing Footer -->
+    <footer class="landing-footer">
+        <div class="footer-brand">
+            <span class="brand-mark" style="width: 24px; height: 24px; font-size: 11px;">IF</span>
+            <strong>IssueFlow</strong>
+        </div>
+        <p>Built with Python Flask, MySQL and Atlassian Design tokens.</p>
+        <span>&copy; 2026 IssueFlow. All rights reserved.</span>
+    </footer>
+</div>
 {% endblock %}

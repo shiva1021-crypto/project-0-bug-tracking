@@ -1,6 +1,22 @@
 {
   "nodes": [
     {
+      "id": "analyze_project_once",
+      "label": "_analyze_project_once.py",
+      "file_type": "code",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "analyze_project_once_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
       "id": "app",
       "label": "app.py",
       "file_type": "code",
@@ -13,7 +29,7 @@
       "label": "create_app()",
       "file_type": "code",
       "source_file": "app.py",
-      "source_location": "L14",
+      "source_location": "L16",
       "_origin": "ast"
     },
     {
@@ -41,11 +57,19 @@
       "_origin": "ast"
     },
     {
+      "id": "config_secret_key",
+      "label": "_secret_key()",
+      "file_type": "code",
+      "source_file": "config.py",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
       "id": "config_config",
       "label": "Config",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L15",
+      "source_location": "L28",
       "_origin": "ast"
     },
     {
@@ -53,7 +77,7 @@
       "label": "DatabaseUnavailable",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L27",
+      "source_location": "L41",
       "_origin": "ast"
     },
     {
@@ -69,7 +93,7 @@
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L28",
+      "source_location": "L42",
       "_origin": "ast"
     },
     {
@@ -77,7 +101,7 @@
       "label": "_db_config()",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L36",
+      "source_location": "L50",
       "_origin": "ast"
     },
     {
@@ -85,7 +109,7 @@
       "label": "get_db_connection()",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L50",
+      "source_location": "L64",
       "_origin": "ast"
     },
     {
@@ -93,7 +117,7 @@
       "label": "get_server_connection()",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L65",
+      "source_location": "L79",
       "_origin": "ast"
     },
     {
@@ -101,7 +125,7 @@
       "label": "db_cursor()",
       "file_type": "code",
       "source_file": "config.py",
-      "source_location": "L73",
+      "source_location": "L87",
       "_origin": "ast"
     },
     {
@@ -117,7 +141,7 @@
       "label": "split_sql_statements()",
       "file_type": "code",
       "source_file": "init_db.py",
-      "source_location": "L16",
+      "source_location": "L17",
       "_origin": "ast"
     },
     {
@@ -125,7 +149,7 @@
       "label": "column_exists()",
       "file_type": "code",
       "source_file": "init_db.py",
-      "source_location": "L20",
+      "source_location": "L21",
       "_origin": "ast"
     },
     {
@@ -133,7 +157,7 @@
       "label": "run_if_needed()",
       "file_type": "code",
       "source_file": "init_db.py",
-      "source_location": "L32",
+      "source_location": "L33",
       "_origin": "ast"
     },
     {
@@ -141,7 +165,7 @@
       "label": "run_migrations()",
       "file_type": "code",
       "source_file": "init_db.py",
-      "source_location": "L40",
+      "source_location": "L41",
       "_origin": "ast"
     },
     {
@@ -149,7 +173,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "init_db.py",
-      "source_location": "L94",
+      "source_location": "L188",
       "_origin": "ast"
     },
     {
@@ -213,7 +237,7 @@
       "label": "get_developers()",
       "file_type": "code",
       "source_file": "models/user_model.py",
-      "source_location": "L17",
+      "source_location": "L21",
       "_origin": "ast"
     },
     {
@@ -269,7 +293,7 @@
       "label": "register()",
       "file_type": "code",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L14",
+      "source_location": "L16",
       "_origin": "ast"
     },
     {
@@ -277,7 +301,7 @@
       "label": "login()",
       "file_type": "code",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L50",
+      "source_location": "L62",
       "_origin": "ast"
     },
     {
@@ -285,7 +309,7 @@
       "label": "logout()",
       "file_type": "code",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L86",
+      "source_location": "L99",
       "_origin": "ast"
     },
     {
@@ -293,7 +317,7 @@
       "label": "get_profile_data()",
       "file_type": "code",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L92",
+      "source_location": "L105",
       "_origin": "ast"
     },
     {
@@ -301,7 +325,7 @@
       "label": "profile()",
       "file_type": "code",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L200",
+      "source_location": "L213",
       "_origin": "ast"
     },
     {
@@ -309,7 +333,7 @@
       "label": "user_profile()",
       "file_type": "code",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L206",
+      "source_location": "L219",
       "_origin": "ast"
     },
     {
@@ -325,7 +349,15 @@
       "label": "allowed_file()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L30",
+      "source_location": "L33",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_bug_routes_detected_image_extension",
+      "label": "detected_image_extension()",
+      "file_type": "code",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L40",
       "_origin": "ast"
     },
     {
@@ -333,7 +365,7 @@
       "label": "save_screenshot()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L37",
+      "source_location": "L55",
       "_origin": "ast"
     },
     {
@@ -341,7 +373,39 @@
       "label": "get_developers()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L52",
+      "source_location": "L76",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_bug_routes_get_projects",
+      "label": "get_projects()",
+      "file_type": "code",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L89",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_bug_routes_normalized_labels",
+      "label": "normalized_labels()",
+      "file_type": "code",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L102",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_bug_routes_parsed_story_points",
+      "label": "parsed_story_points()",
+      "file_type": "code",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L111",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_bug_routes_parsed_due_date",
+      "label": "parsed_due_date()",
+      "file_type": "code",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L119",
       "_origin": "ast"
     },
     {
@@ -349,7 +413,7 @@
       "label": "dashboard()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L67",
+      "source_location": "L127",
       "_origin": "ast"
     },
     {
@@ -357,7 +421,7 @@
       "label": "add_bug()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L111",
+      "source_location": "L171",
       "_origin": "ast"
     },
     {
@@ -365,7 +429,7 @@
       "label": "view_bugs()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L168",
+      "source_location": "L315",
       "_origin": "ast"
     },
     {
@@ -373,7 +437,7 @@
       "label": "bug_details()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L225",
+      "source_location": "L394",
       "_origin": "ast"
     },
     {
@@ -381,7 +445,7 @@
       "label": "edit_bug()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L293",
+      "source_location": "L491",
       "_origin": "ast"
     },
     {
@@ -389,7 +453,7 @@
       "label": "assign_bug()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L374",
+      "source_location": "L626",
       "_origin": "ast"
     },
     {
@@ -397,7 +461,7 @@
       "label": "update_status()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L448",
+      "source_location": "L700",
       "_origin": "ast"
     },
     {
@@ -405,7 +469,39 @@
       "label": "add_comment()",
       "file_type": "code",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L503",
+      "source_location": "L774",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_bug_routes_toggle_watch",
+      "label": "toggle_watch()",
+      "file_type": "code",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L805",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_project_routes",
+      "label": "project_routes.py",
+      "file_type": "code",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_project_routes_projects",
+      "label": "projects()",
+      "file_type": "code",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "routes_project_routes_board",
+      "label": "board()",
+      "file_type": "code",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L73",
       "_origin": "ast"
     },
     {
@@ -417,11 +513,19 @@
       "_origin": "ast"
     },
     {
+      "id": "routes_report_routes_safe_csv_cell",
+      "label": "safe_csv_cell()",
+      "file_type": "code",
+      "source_file": "routes/report_routes.py",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
       "id": "routes_report_routes_with_percent",
       "label": "with_percent()",
       "file_type": "code",
       "source_file": "routes/report_routes.py",
-      "source_location": "L14",
+      "source_location": "L25",
       "_origin": "ast"
     },
     {
@@ -429,7 +533,7 @@
       "label": "build_report_query()",
       "file_type": "code",
       "source_file": "routes/report_routes.py",
-      "source_location": "L26",
+      "source_location": "L37",
       "_origin": "ast"
     },
     {
@@ -437,7 +541,7 @@
       "label": "reports()",
       "file_type": "code",
       "source_file": "routes/report_routes.py",
-      "source_location": "L66",
+      "source_location": "L87",
       "_origin": "ast"
     },
     {
@@ -449,11 +553,259 @@
       "_origin": "ast"
     },
     {
+      "id": "seed_demo_data",
+      "label": "seed_demo_data.py",
+      "file_type": "code",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "seed_demo_data_weighted_choice",
+      "label": "weighted_choice()",
+      "file_type": "code",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L99",
+      "_origin": "ast"
+    },
+    {
+      "id": "seed_demo_data_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L104",
+      "_origin": "ast"
+    },
+    {
+      "id": "seed_demo_data_rationale_1",
+      "label": "Populate the Demo Organization with deterministic, realistic test data.",
+      "file_type": "rationale",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
       "id": "js_script",
       "label": "script.js",
       "file_type": "code",
       "source_file": "static/js/script.js",
       "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "js_script_init",
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L53",
+      "_origin": "ast"
+    },
+    {
+      "id": "js_script_show",
+      "label": "show()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L60",
+      "_origin": "ast"
+    },
+    {
+      "id": "js_script_updatecolumncardcounts",
+      "label": "updateColumnCardCounts()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L202",
+      "_origin": "ast"
+    },
+    {
+      "id": "js_script_submitassignment",
+      "label": "submitAssignment()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L406",
+      "_origin": "ast"
+    },
+    {
+      "id": "js_script_escapehtml",
+      "label": "escapeHTML()",
+      "file_type": "code",
+      "source_file": "static/js/script.js",
+      "source_location": "L447",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers",
+      "label": "test_security_and_helpers.py",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakecursor",
+      "label": "FakeCursor",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakecursor_init",
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L24",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakecursor_execute",
+      "label": ".execute()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L29",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakecursor_fetchone",
+      "label": ".fetchone()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L33",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakecursor_close",
+      "label": ".close()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L36",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakeconnection",
+      "label": "FakeConnection",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L40",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakeconnection_init",
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L41",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakeconnection_cursor",
+      "label": ".cursor()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L44",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_fakeconnection_close",
+      "label": ".close()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L47",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests",
+      "label": "SecurityAndHelperTests",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L51",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_role_is_refreshed_before_authorization",
+      "label": ".test_role_is_refreshed_before_authorization()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L52",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_screenshot_route_requires_login",
+      "label": ".test_screenshot_route_requires_login()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L83",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_csv_formula_prefixes_are_neutralized",
+      "label": ".test_csv_formula_prefixes_are_neutralized()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L89",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_real_image_signature_is_detected",
+      "label": ".test_real_image_signature_is_detected()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L95",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_issue_metadata_is_normalized",
+      "label": ".test_jira_style_issue_metadata_is_normalized()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L101",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_production_rejects_missing_secret",
+      "label": ".test_production_rejects_missing_secret()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L111",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_bug_model_scopes_query_to_organization",
+      "label": ".test_bug_model_scopes_query_to_organization()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L118",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_pagination_clamps_invalid_and_excess_pages",
+      "label": ".test_pagination_clamps_invalid_and_excess_pages()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L129",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_logout_only_accepts_post",
+      "label": ".test_logout_only_accepts_post()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L135",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_routes_are_registered",
+      "label": ".test_jira_style_routes_are_registered()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L142",
+      "_origin": "ast"
+    },
+    {
+      "id": "tests_test_security_and_helpers_securityandhelpertests_test_premium_landing_page_renders",
+      "label": ".test_premium_landing_page_renders()",
+      "file_type": "code",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L148",
       "_origin": "ast"
     },
     {
@@ -477,7 +829,15 @@
       "label": "has_valid_session()",
       "file_type": "code",
       "source_file": "utils/decorators.py",
-      "source_location": "L6",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "utils_decorators_refresh_session_user",
+      "label": "refresh_session_user()",
+      "file_type": "code",
+      "source_file": "utils/decorators.py",
+      "source_location": "L12",
       "_origin": "ast"
     },
     {
@@ -485,7 +845,7 @@
       "label": "login_required()",
       "file_type": "code",
       "source_file": "utils/decorators.py",
-      "source_location": "L10",
+      "source_location": "L43",
       "_origin": "ast"
     },
     {
@@ -493,7 +853,7 @@
       "label": "role_required()",
       "file_type": "code",
       "source_file": "utils/decorators.py",
-      "source_location": "L22",
+      "source_location": "L55",
       "_origin": "ast"
     },
     {
@@ -501,7 +861,7 @@
       "label": "can_update_bug_status()",
       "file_type": "code",
       "source_file": "utils/decorators.py",
-      "source_location": "L42",
+      "source_location": "L75",
       "_origin": "ast"
     },
     {
@@ -518,6 +878,22 @@
       "file_type": "code",
       "source_file": "utils/notifications.py",
       "source_location": "L10",
+      "_origin": "ast"
+    },
+    {
+      "id": "utils_pagination",
+      "label": "pagination.py",
+      "file_type": "code",
+      "source_file": "utils/pagination.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "utils_pagination_pagination_values",
+      "label": "pagination_values()",
+      "file_type": "code",
+      "source_file": "utils/pagination.py",
+      "source_location": "L1",
       "_origin": "ast"
     },
     {
@@ -562,6 +938,125 @@
     }
   ],
   "edges": [
+    {
+      "source": "analyze_project_once",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "pathlib",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_analyze",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_build",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_cluster",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_detect",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_export",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_extract",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "graphify_report",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "app",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once",
+      "target": "analyze_project_once_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
     {
       "source": "app",
       "target": "os",
@@ -644,7 +1139,7 @@
     },
     {
       "source": "app",
-      "target": "utils_security",
+      "target": "routes_project_routes",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -654,11 +1149,31 @@
     },
     {
       "source": "app",
+      "target": "utils_decorators",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "utils_security",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
       "target": "app_create_app",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app.py",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -722,8 +1237,8 @@
     },
     {
       "source": "config",
-      "target": "contextlib",
-      "relation": "imports_from",
+      "target": "secrets",
+      "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
@@ -732,7 +1247,7 @@
     },
     {
       "source": "config",
-      "target": "pathlib",
+      "target": "contextlib",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -742,18 +1257,18 @@
     },
     {
       "source": "config",
-      "target": "mysql_connector",
-      "relation": "imports",
+      "target": "pathlib",
+      "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L5",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
       "source": "config",
-      "target": "dotenv",
-      "relation": "imports_from",
+      "target": "mysql_connector",
+      "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
@@ -762,7 +1277,7 @@
     },
     {
       "source": "config",
-      "target": "mysql_connector",
+      "target": "dotenv",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -782,11 +1297,30 @@
     },
     {
       "source": "config",
+      "target": "mysql_connector",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "config.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "config",
+      "target": "config_secret_key",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "config.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "config",
       "target": "config_config",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L15",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -795,7 +1329,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L27",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -804,7 +1338,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L27",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -813,21 +1347,12 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L28",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
       "source": "config",
       "target": "config_db_config",
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "config.py",
-      "source_location": "L36",
-      "weight": 1.0
-    },
-    {
-      "source": "config",
-      "target": "config_get_db_connection",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
@@ -836,11 +1361,20 @@
     },
     {
       "source": "config",
+      "target": "config_get_db_connection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "config.py",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "config",
       "target": "config_get_server_connection",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L65",
+      "source_location": "L79",
       "weight": 1.0
     },
     {
@@ -849,7 +1383,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L73",
+      "source_location": "L87",
+      "weight": 1.0
+    },
+    {
+      "source": "config_secret_key",
+      "target": "runtimeerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "config.py",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -859,7 +1403,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L58",
+      "source_location": "L72",
       "weight": 1.0
     },
     {
@@ -869,7 +1413,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L62",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -879,7 +1423,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L67",
+      "source_location": "L81",
       "weight": 1.0
     },
     {
@@ -889,7 +1433,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L69",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -899,7 +1443,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "config.py",
-      "source_location": "L74",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -914,12 +1458,22 @@
     },
     {
       "source": "init_db",
+      "target": "re",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "init_db.py",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "init_db",
       "target": "pathlib",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -929,7 +1483,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L4",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -939,7 +1493,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L5",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -949,7 +1503,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L6",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -958,7 +1512,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -967,7 +1521,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -976,7 +1530,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L32",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -985,7 +1539,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -994,7 +1548,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L94",
+      "source_location": "L188",
       "weight": 1.0
     },
     {
@@ -1004,7 +1558,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L49",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -1014,7 +1568,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L73",
+      "source_location": "L144",
       "weight": 1.0
     },
     {
@@ -1024,7 +1578,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L116",
+      "source_location": "L210",
       "weight": 1.0
     },
     {
@@ -1034,7 +1588,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L117",
+      "source_location": "L211",
       "weight": 1.0
     },
     {
@@ -1044,7 +1598,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "init_db.py",
-      "source_location": "L119",
+      "source_location": "L213",
       "weight": 1.0
     },
     {
@@ -1110,7 +1664,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "models/user_model.py",
-      "source_location": "L17",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -1192,12 +1746,22 @@
     },
     {
       "source": "routes_auth_routes",
+      "target": "re",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/auth_routes.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_auth_routes",
       "target": "flask",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L1",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -1207,7 +1771,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L2",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -1217,7 +1781,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -1227,7 +1791,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -1236,7 +1800,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -1245,7 +1809,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L50",
+      "source_location": "L62",
       "weight": 1.0
     },
     {
@@ -1254,7 +1818,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L86",
+      "source_location": "L99",
       "weight": 1.0
     },
     {
@@ -1263,7 +1827,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L92",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -1272,7 +1836,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L200",
+      "source_location": "L213",
       "weight": 1.0
     },
     {
@@ -1281,7 +1845,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L206",
+      "source_location": "L219",
       "weight": 1.0
     },
     {
@@ -1291,7 +1855,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L207",
+      "source_location": "L220",
       "weight": 1.0
     },
     {
@@ -1306,7 +1870,7 @@
     },
     {
       "source": "routes_bug_routes",
-      "target": "uuid",
+      "target": "datetime",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -1316,12 +1880,22 @@
     },
     {
       "source": "routes_bug_routes",
+      "target": "uuid",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
       "target": "flask",
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L4",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -1331,7 +1905,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -1341,7 +1915,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -1351,7 +1925,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -1361,7 +1935,17 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L19",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "utils_pagination",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -1370,7 +1954,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L30",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "routes_bug_routes_detected_image_extension",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L40",
       "weight": 1.0
     },
     {
@@ -1379,7 +1972,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L37",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -1388,21 +1981,30 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L52",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
       "source": "routes_bug_routes",
-      "target": "routes_bug_routes_dashboard",
+      "target": "routes_bug_routes_get_projects",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L67",
+      "source_location": "L89",
       "weight": 1.0
     },
     {
       "source": "routes_bug_routes",
-      "target": "routes_bug_routes_add_bug",
+      "target": "routes_bug_routes_normalized_labels",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "routes_bug_routes_parsed_story_points",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
@@ -1411,11 +2013,38 @@
     },
     {
       "source": "routes_bug_routes",
+      "target": "routes_bug_routes_parsed_due_date",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "routes_bug_routes_dashboard",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "routes_bug_routes_add_bug",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L171",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
       "target": "routes_bug_routes_view_bugs",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L168",
+      "source_location": "L315",
       "weight": 1.0
     },
     {
@@ -1424,7 +2053,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L225",
+      "source_location": "L394",
       "weight": 1.0
     },
     {
@@ -1433,7 +2062,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L293",
+      "source_location": "L491",
       "weight": 1.0
     },
     {
@@ -1442,7 +2071,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L374",
+      "source_location": "L626",
       "weight": 1.0
     },
     {
@@ -1451,7 +2080,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L448",
+      "source_location": "L700",
       "weight": 1.0
     },
     {
@@ -1460,7 +2089,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L503",
+      "source_location": "L774",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "routes_bug_routes_toggle_watch",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L805",
       "weight": 1.0
     },
     {
@@ -1470,7 +2108,47 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L41",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_save_screenshot",
+      "target": "routes_bug_routes_detected_image_extension",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_add_bug",
+      "target": "routes_bug_routes_normalized_labels",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_add_bug",
+      "target": "routes_bug_routes_parsed_story_points",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L186",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_add_bug",
+      "target": "routes_bug_routes_parsed_due_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L187",
       "weight": 1.0
     },
     {
@@ -1480,7 +2158,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L125",
+      "source_location": "L203",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_add_bug",
+      "target": "routes_bug_routes_get_projects",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L286",
       "weight": 1.0
     },
     {
@@ -1490,7 +2178,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L208",
+      "source_location": "L372",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_view_bugs",
+      "target": "routes_bug_routes_get_projects",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L373",
       "weight": 1.0
     },
     {
@@ -1500,7 +2198,37 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L275",
+      "source_location": "L471",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_edit_bug",
+      "target": "routes_bug_routes_normalized_labels",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L522",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_edit_bug",
+      "target": "routes_bug_routes_parsed_story_points",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L525",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_edit_bug",
+      "target": "routes_bug_routes_parsed_due_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L526",
       "weight": 1.0
     },
     {
@@ -1510,7 +2238,85 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L328",
+      "source_location": "L542",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "re",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "flask",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "mysql_connector",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "routes_bug_routes",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "utils_decorators",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "routes_project_routes_projects",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "routes_project_routes_board",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -1575,11 +2381,30 @@
     },
     {
       "source": "routes_report_routes",
+      "target": "utils_pagination",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/report_routes.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_report_routes",
+      "target": "routes_report_routes_safe_csv_cell",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/report_routes.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_report_routes",
       "target": "routes_report_routes_with_percent",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/report_routes.py",
-      "source_location": "L14",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -1588,7 +2413,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/report_routes.py",
-      "source_location": "L26",
+      "source_location": "L37",
       "weight": 1.0
     },
     {
@@ -1597,7 +2422,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "routes/report_routes.py",
-      "source_location": "L66",
+      "source_location": "L87",
       "weight": 1.0
     },
     {
@@ -1607,7 +2432,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/report_routes.py",
-      "source_location": "L67",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_report_routes_reports",
+      "target": "routes_report_routes_safe_csv_cell",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/report_routes.py",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -1617,7 +2452,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/report_routes.py",
-      "source_location": "L125",
+      "source_location": "L171",
       "weight": 1.0
     },
     {
@@ -1628,6 +2463,497 @@
       "confidence": "EXTRACTED",
       "source_file": "run_dev.py",
       "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "random",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "datetime",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "werkzeug_security",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "seed_demo_data_weighted_choice",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L99",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "seed_demo_data_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data_main",
+      "target": "seed_demo_data_weighted_choice",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L177",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data_rationale_1",
+      "target": "seed_demo_data",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "js_script",
+      "target": "js_script_init",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "js_script",
+      "target": "js_script_show",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "js_script",
+      "target": "js_script_updatecolumncardcounts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L202",
+      "weight": 1.0
+    },
+    {
+      "source": "js_script",
+      "target": "js_script_submitassignment",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L406",
+      "weight": 1.0
+    },
+    {
+      "source": "js_script",
+      "target": "js_script_escapehtml",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L447",
+      "weight": 1.0
+    },
+    {
+      "source": "js_script_show",
+      "target": "js_script_init",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "static/js/script.js",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "io",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "os",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "unittest",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "types",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "unittest_mock",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "flask",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "config",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "app",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "models",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_bug_routes",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_report_routes",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "utils_decorators",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "utils_pagination",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "tests_test_security_and_helpers_fakecursor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakecursor",
+      "target": "tests_test_security_and_helpers_fakecursor_init",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakecursor",
+      "target": "tests_test_security_and_helpers_fakecursor_execute",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakecursor",
+      "target": "tests_test_security_and_helpers_fakecursor_fetchone",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakecursor",
+      "target": "tests_test_security_and_helpers_fakecursor_close",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "tests_test_security_and_helpers_fakeconnection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakeconnection",
+      "target": "tests_test_security_and_helpers_fakeconnection_init",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakeconnection",
+      "target": "tests_test_security_and_helpers_fakeconnection_cursor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_fakeconnection",
+      "target": "tests_test_security_and_helpers_fakeconnection_close",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "tests_test_security_and_helpers_securityandhelpertests",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_role_is_refreshed_before_authorization",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_screenshot_route_requires_login",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L83",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_csv_formula_prefixes_are_neutralized",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_real_image_signature_is_detected",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_issue_metadata_is_normalized",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_production_rejects_missing_secret",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L111",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_bug_model_scopes_query_to_organization",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L118",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_pagination_clamps_invalid_and_excess_pages",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_logout_only_accepts_post",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L135",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_routes_are_registered",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L142",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests",
+      "target": "tests_test_security_and_helpers_securityandhelpertests_test_premium_landing_page_renders",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L148",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_role_is_refreshed_before_authorization",
+      "target": "tests_test_security_and_helpers_fakecursor",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L59",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_role_is_refreshed_before_authorization",
+      "target": "tests_test_security_and_helpers_fakeconnection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_bug_model_scopes_query_to_organization",
+      "target": "tests_test_security_and_helpers_fakecursor",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_bug_model_scopes_query_to_organization",
+      "target": "tests_test_security_and_helpers_fakeconnection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L122",
       "weight": 1.0
     },
     {
@@ -1652,11 +2978,30 @@
     },
     {
       "source": "utils_decorators",
+      "target": "config",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/decorators.py",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "utils_decorators",
       "target": "utils_decorators_has_valid_session",
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "utils/decorators.py",
-      "source_location": "L6",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "utils_decorators",
+      "target": "utils_decorators_refresh_session_user",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/decorators.py",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -1665,7 +3010,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "utils/decorators.py",
-      "source_location": "L10",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -1674,7 +3019,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "utils/decorators.py",
-      "source_location": "L22",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -1683,7 +3028,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "utils/decorators.py",
-      "source_location": "L42",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "utils_decorators_refresh_session_user",
+      "target": "utils_decorators_has_valid_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/decorators.py",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -1733,6 +3088,15 @@
       "confidence": "EXTRACTED",
       "source_file": "utils/notifications.py",
       "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "utils_pagination",
+      "target": "utils_pagination_pagination_values",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/pagination.py",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
@@ -1793,6 +3157,16 @@
       "weight": 1.0
     },
     {
+      "source": "analyze_project_once",
+      "target": "config_get_db_connection",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
       "source": "app",
       "target": "config_config",
       "relation": "imports",
@@ -1814,12 +3188,32 @@
     },
     {
       "source": "app",
+      "target": "config_db_cursor",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "utils_decorators_login_required",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
       "target": "utils_security_csrf_token",
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app.py",
-      "source_location": "L11",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -1829,7 +3223,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app.py",
-      "source_location": "L11",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -1839,7 +3233,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app.py",
-      "source_location": "L11",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -1899,7 +3293,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -1909,7 +3303,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -1919,7 +3313,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -1929,7 +3323,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -1939,7 +3333,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -1949,7 +3343,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -1959,7 +3353,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -1969,7 +3363,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -1979,7 +3373,37 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "routes/bug_routes.py",
-      "source_location": "L19",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes",
+      "target": "utils_pagination_pagination_values",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "config_get_db_connection",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes",
+      "target": "utils_decorators_login_required",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/project_routes.py",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -2000,6 +3424,136 @@
       "confidence": "EXTRACTED",
       "source_file": "routes/report_routes.py",
       "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_report_routes",
+      "target": "utils_pagination_pagination_values",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/report_routes.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data",
+      "target": "config_get_db_connection",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_bug_routes_detected_image_extension",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_bug_routes_normalized_labels",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_bug_routes_parsed_due_date",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_bug_routes_parsed_story_points",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "routes_report_routes_safe_csv_cell",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "utils_decorators_role_required",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "utils_pagination_pagination_values",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "utils_decorators",
+      "target": "config_get_db_connection",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/decorators.py",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers",
+      "target": "models_bug_model",
+      "relation": "imports_from",
+      "context": "submodule_import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "analyze_project_once_main",
+      "target": "config_get_db_connection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "_analyze_project_once.py",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "app_create_app",
+      "target": "config_db_cursor",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -2039,7 +3593,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "models/user_model.py",
-      "source_location": "L18",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -2049,7 +3603,27 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "routes/auth_routes.py",
-      "source_location": "L93",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data_main",
+      "target": "config_get_db_connection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo_data.py",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "utils_decorators_refresh_session_user",
+      "target": "config_get_db_connection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/decorators.py",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -2093,7 +3667,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/auth_routes.py",
-      "source_location": "L26",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -2104,7 +3678,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/auth_routes.py",
-      "source_location": "L55",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -2115,7 +3689,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L68",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -2126,7 +3700,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L127",
+      "source_location": "L205",
       "weight": 1.0
     },
     {
@@ -2137,7 +3711,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L204",
+      "source_location": "L359",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_view_bugs",
+      "target": "utils_pagination_pagination_values",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L364",
       "weight": 1.0
     },
     {
@@ -2148,7 +3733,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L226",
+      "source_location": "L395",
       "weight": 1.0
     },
     {
@@ -2159,7 +3744,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L287",
+      "source_location": "L485",
       "weight": 1.0
     },
     {
@@ -2170,7 +3755,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L294",
+      "source_location": "L492",
       "weight": 1.0
     },
     {
@@ -2181,7 +3766,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L378",
+      "source_location": "L630",
       "weight": 1.0
     },
     {
@@ -2192,7 +3777,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L436",
+      "source_location": "L688",
       "weight": 1.0
     },
     {
@@ -2203,7 +3788,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L454",
+      "source_location": "L706",
       "weight": 1.0
     },
     {
@@ -2214,7 +3799,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L463",
+      "source_location": "L715",
       "weight": 1.0
     },
     {
@@ -2225,7 +3810,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L493",
+      "source_location": "L756",
       "weight": 1.0
     },
     {
@@ -2236,7 +3821,40 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/bug_routes.py",
-      "source_location": "L509",
+      "source_location": "L780",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_bug_routes_toggle_watch",
+      "target": "config_get_db_connection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "routes/bug_routes.py",
+      "source_location": "L807",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes_projects",
+      "target": "config_get_db_connection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "routes/project_routes.py",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_project_routes_board",
+      "target": "config_get_db_connection",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "routes/project_routes.py",
+      "source_location": "L75",
       "weight": 1.0
     },
     {
@@ -2247,11 +3865,109 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "routes/report_routes.py",
-      "source_location": "L71",
+      "source_location": "L94",
+      "weight": 1.0
+    },
+    {
+      "source": "routes_report_routes_reports",
+      "target": "utils_pagination_pagination_values",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "routes/report_routes.py",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "seed_demo_data_main",
+      "target": "runtimeerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "seed_demo_data.py",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_role_is_refreshed_before_authorization",
+      "target": "utils_decorators_role_required",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_csv_formula_prefixes_are_neutralized",
+      "target": "routes_report_routes_safe_csv_cell",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_real_image_signature_is_detected",
+      "target": "routes_bug_routes_detected_image_extension",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_issue_metadata_is_normalized",
+      "target": "routes_bug_routes_normalized_labels",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L103",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_issue_metadata_is_normalized",
+      "target": "routes_bug_routes_parsed_story_points",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_jira_style_issue_metadata_is_normalized",
+      "target": "routes_bug_routes_parsed_due_date",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_test_security_and_helpers_securityandhelpertests_test_pagination_clamps_invalid_and_excess_pages",
+      "target": "utils_pagination_pagination_values",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "tests/test_security_and_helpers.py",
+      "source_location": "L130",
       "weight": 1.0
     }
   ],
-  "hyperedges": [],
   "input_tokens": 0,
   "output_tokens": 0
 }

@@ -7,17 +7,22 @@ from unittest.mock import patch
 from flask import Flask, session
 
 import config
+import seed_demo_data
 from app import app as application
 from models import bug_model
-from routes.bug_routes import (
-    detected_image_extension,
+from routes.bug_routes import detected_image_extension
+from services.issue_service import (
+    HierarchyError,
     normalized_labels,
     parsed_due_date,
     parsed_story_points,
+    resolve_parent,
 )
 from routes.report_routes import safe_csv_cell
 from utils.decorators import role_required
 from utils.pagination import pagination_values
+from utils import rate_limit
+from utils.notifications import queue_email
 
 
 class FakeCursor:
@@ -46,6 +51,15 @@ class FakeConnection:
 
     def close(self):
         pass
+
+
+class SequencedCursor(FakeCursor):
+    def __init__(self, rows):
+        super().__init__()
+        self.rows = iter(rows)
+
+    def fetchone(self):
+        return next(self.rows)
 
 
 class SecurityAndHelperTests(unittest.TestCase):
@@ -144,12 +158,46 @@ class SecurityAndHelperTests(unittest.TestCase):
         self.assertIn("project.projects", endpoints)
         self.assertIn("project.board", endpoints)
         self.assertIn("bug.toggle_watch", endpoints)
+        self.assertIn("auth.verify_registration", endpoints)
 
     def test_premium_landing_page_renders(self):
         response = application.test_client().get("/")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Turn complex work into", response.data)
         self.assertIn(b"Kanban board preview", response.data)
+        self.assertIn(b"Explore a workspace that already feels active", response.data)
+        self.assertNotIn(b"Local demo accounts use the password", response.data)
+
+    def test_demo_seed_is_refused_in_production(self):
+        with patch.dict(os.environ, {"APP_ENV": "production"}, clear=False):
+            with patch("seed_demo_data.get_db_connection") as connection:
+                with self.assertRaises(RuntimeError):
+                    seed_demo_data.main()
+                connection.assert_not_called()
+
+    def test_registration_rate_limit_rejects_excess_attempts(self):
+        rate_limit._events.clear()
+        app = Flask(__name__)
+        app.config["TESTING"] = False
+        with app.app_context():
+            self.assertFalse(rate_limit.rate_limit_exceeded("register", "test", 2, 60))
+            self.assertFalse(rate_limit.rate_limit_exceeded("register", "test", 2, 60))
+            self.assertTrue(rate_limit.rate_limit_exceeded("register", "test", 2, 60))
+
+    def test_email_is_submitted_to_background_executor(self):
+        with patch("utils.notifications._email_executor.submit") as submit:
+            queue_email("person@example.com", "Subject", "Body")
+        submit.assert_called_once()
+
+    def test_parent_cycle_is_rejected(self):
+        cursor = SequencedCursor(
+            [
+                {"id": 2, "issue_type": "Epic", "parent_id": 1},
+                {"id": 1, "issue_type": "Story", "parent_id": 2},
+            ]
+        )
+        with self.assertRaises(HierarchyError):
+            resolve_parent(cursor, "Story", 2, 7, 3, issue_id=1)
 
 
 if __name__ == "__main__":

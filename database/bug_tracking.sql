@@ -34,6 +34,28 @@ CREATE TABLE IF NOT EXISTS users (
         FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS registration_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    organization_id INT NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    requested_role ENUM('admin', 'project_manager', 'developer', 'tester') NOT NULL DEFAULT 'tester',
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+    requester_ip VARCHAR(45),
+    verification_token_hash CHAR(64) NULL,
+    verified_at DATETIME NULL,
+    requested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at DATETIME NULL,
+    reviewed_by INT NULL,
+    INDEX idx_registration_org_status (organization_id, status),
+    INDEX idx_registration_email (email),
+    CONSTRAINT fk_registration_organization
+        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_registration_reviewer
+        FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS bugs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     organization_id INT NOT NULL,

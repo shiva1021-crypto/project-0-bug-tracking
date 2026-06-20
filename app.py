@@ -7,6 +7,7 @@ from config import Config, DatabaseUnavailable, db_cursor
 from routes.admin_routes import admin_bp
 from routes.auth_routes import auth_bp
 from routes.bug_routes import bug_bp
+from routes import workflow_routes  # noqa: F401 - attaches workflow routes to bug_bp
 from routes.report_routes import report_bp
 from routes.project_routes import project_bp
 from utils.decorators import login_required
@@ -38,6 +39,7 @@ def create_app():
             "current_organization_id": session.get("organization_id"),
             "current_organization_name": session.get("organization_name"),
             "csrf_token": csrf_token,
+            "show_demo_credentials": app.config["SHOW_DEMO_CREDENTIALS"],
         }
 
     @app.route("/")

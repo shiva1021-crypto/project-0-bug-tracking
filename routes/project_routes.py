@@ -1,11 +1,13 @@
 import re
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from mysql.connector import Error
 
 from config import get_db_connection
-from routes.bug_routes import STATUSES
+from repositories.issue_repository import count_board_issues, get_board_issues, get_projects
+from services.issue_service import STATUSES
 from utils.decorators import login_required
+from utils.pagination import pagination_values
 
 
 project_bp = Blueprint("project", __name__)
@@ -74,34 +76,15 @@ def board():
     selected_project = request.args.get("project", "")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute(
-        """
-        SELECT id, name, project_key
-        FROM projects
-        WHERE organization_id = %s
-        ORDER BY name
-        """,
-        (session["organization_id"],),
+    projects = get_projects(cursor, session["organization_id"])
+    project_id = int(selected_project) if selected_project.isdigit() else None
+    page_size = current_app.config["BOARD_PAGE_SIZE"]
+    total = count_board_issues(cursor, session["organization_id"], project_id)
+    pagination = pagination_values(request.args.get("page", 1), total, page_size)
+    offset = (pagination["page"] - 1) * page_size
+    issues = get_board_issues(
+        cursor, session["organization_id"], project_id, page_size, offset
     )
-    projects = cursor.fetchall()
-
-    query = """
-        SELECT bugs.id, bugs.issue_key, bugs.issue_type, bugs.title, bugs.status,
-               bugs.priority, bugs.story_points, bugs.due_date, bugs.labels,
-               bugs.assigned_to, users.full_name AS assignee_name,
-               projects.name AS project_name, projects.project_key
-        FROM bugs
-        JOIN projects ON bugs.project_id = projects.id
-        LEFT JOIN users ON bugs.assigned_to = users.id
-        WHERE bugs.organization_id = %s
-    """
-    params = [session["organization_id"]]
-    if selected_project.isdigit():
-        query += " AND bugs.project_id = %s"
-        params.append(int(selected_project))
-    query += " ORDER BY bugs.priority DESC, bugs.created_at DESC"
-    cursor.execute(query, params)
-    issues = cursor.fetchall()
     cursor.close()
     conn.close()
 
@@ -115,4 +98,5 @@ def board():
         statuses=STATUSES,
         projects=projects,
         selected_project=selected_project,
+        pagination=pagination,
     )

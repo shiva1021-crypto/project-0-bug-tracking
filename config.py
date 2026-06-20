@@ -26,6 +26,7 @@ def _secret_key():
 
 
 class Config:
+    APP_ENV = os.getenv("APP_ENV", "development").lower()
     SECRET_KEY = _secret_key()
     UPLOAD_FOLDER = str(BASE_DIR / "uploads" / "bug_screenshots")
     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -35,6 +36,15 @@ class Config:
     SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
     PERMANENT_SESSION_LIFETIME = int(os.getenv("SESSION_LIFETIME_SECONDS", "7200"))
     PAGE_SIZE = max(int(os.getenv("PAGE_SIZE", "20")), 1)
+    BOARD_PAGE_SIZE = max(int(os.getenv("BOARD_PAGE_SIZE", "40")), 1)
+    SHOW_DEMO_CREDENTIALS = (
+        APP_ENV != "production"
+        and os.getenv("SHOW_DEMO_CREDENTIALS", "false").lower() == "true"
+    )
+    REQUIRE_EMAIL_VERIFICATION = (
+        APP_ENV == "production"
+        or os.getenv("REQUIRE_EMAIL_VERIFICATION", "false").lower() == "true"
+    )
     WTF_CSRF_ENABLED = True
 
 

@@ -4,7 +4,7 @@ from io import StringIO
 from flask import Blueprint, Response, current_app, render_template, request, session, url_for
 
 from config import get_db_connection
-from routes.bug_routes import ISSUE_TYPES, PRIORITIES, SEVERITIES, STATUSES
+from services.issue_service import ISSUE_TYPES, PRIORITIES, SEVERITIES, STATUSES
 from utils.decorators import role_required
 from utils.pagination import pagination_values
 

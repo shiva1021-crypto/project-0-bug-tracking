@@ -240,7 +240,7 @@ Bug status changes are isolated to the assigned developer. Admins and project ma
 
 ## Tenant Isolation Rule
 
-Each organization is treated as a separate tenant. Users can only see and manage bugs, comments, reports, profiles, developers, and user records that belong to their own organization. Public registration creates a new organization and makes the first user the admin. Additional users should be created from the admin user management page.
+Each organization is treated as a separate tenant. Users can only see and manage issues, comments, reports, profiles, developers, and user records that belong to their own organization. Public registration creates a pending request for an existing organization; it never creates an organization or grants admin access. An organization administrator must approve the request and select its role. In production, the requester must verify their email first.
 
 ## Optional Production Settings
 
@@ -252,6 +252,7 @@ Production requires `APP_ENV=production` and a random `SECRET_KEY` of at least 3
 APP_ENV=production
 SECRET_KEY=replace-with-a-long-random-secret
 SESSION_COOKIE_SECURE=true
+REQUIRE_EMAIL_VERIFICATION=true
 ```
 
 ## Setup Instructions
@@ -403,7 +404,8 @@ SELECT * FROM bug_history;
 | URL | Purpose |
 | --- | --- |
 | `/` | Home page |
-| `/register` | User registration |
+| `/register` | Submit an organization access request |
+| `/register/verify/<token>` | Verify a registration email |
 | `/login` | User login |
 | `/logout` | User logout |
 | `/profile` | Logged-in user's profile |
@@ -420,13 +422,24 @@ SELECT * FROM bug_history;
 
 ## Testing Checklist
 
+### Generate realistic demo data
+
+After initializing the database and creating the Demo Organization users, run:
+
+```powershell
+venv\Scripts\python seed_demo_data.py
+```
+
+The deterministic seed adds projects, users, issues, hierarchy, assignments, comments, history, estimates, due dates, labels, and watchers. Set `DEMO_SEED_PASSWORD` locally when you need a repeatable password; otherwise the command generates and prints a one-time random password. Demo seeding is refused when `APP_ENV=production`, and re-running the command safely skips existing demo issues.
+
 Run the automated security and helper tests:
 
 ```powershell
 venv\Scripts\python -m unittest discover -s tests -v
 ```
 
-- User can register successfully.
+- User can submit an access request without receiving immediate access.
+- Verified requests can be approved or rejected by an organization administrator.
 - User can login successfully.
 - Wrong password shows an error.
 - Logout works.

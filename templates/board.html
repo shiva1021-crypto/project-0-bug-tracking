@@ -1,68 +1,457 @@
 {% extends "base.html" %}
 
-{% block title %}Kanban Board - Bug Tracking Tool{% endblock %}
+{% block title %}Kanban Board — IssueFlow{% endblock %}
 
 {% block content %}
-<div class="page-heading">
-    <div>
-        <p class="eyebrow">Delivery workflow</p>
-        <h1>Kanban Board</h1>
+<style>
+    /* High-fidelity Jira Board styles */
+    .jira-breadcrumbs {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+    .board-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .board-title-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .board-title-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius);
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .board-title-text h1 {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0;
+    }
+    .board-sub-nav {
+        display: flex;
+        border-bottom: 2px solid var(--border);
+        margin-bottom: 20px;
+        gap: 24px;
+        overflow-x: auto;
+        padding-bottom: 1px;
+    }
+    .board-sub-nav a {
+        padding: 8px 0;
+        color: var(--text-subtle);
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+        text-decoration: none;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+    .board-sub-nav a:hover {
+        color: var(--text);
+    }
+    .board-sub-nav a.active {
+        color: var(--primary);
+        font-weight: 700;
+        border-bottom: 2px solid var(--primary);
+    }
+    .board-controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .board-controls-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .board-search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    .board-search-icon {
+        position: absolute;
+        left: 10px;
+        color: var(--text-muted);
+        font-size: 13px;
+        pointer-events: none;
+    }
+    .board-search-input {
+        padding: 6px 12px 6px 28px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        font-size: 13px;
+        width: 150px;
+        min-height: auto !important;
+        background: var(--bg);
+        color: var(--text);
+        outline: none;
+        transition: border-color var(--transition-speed), width var(--transition-speed);
+    }
+    .board-search-input:focus {
+        border-color: var(--primary);
+        width: 200px;
+    }
+    .board-avatars-list {
+        display: flex;
+        align-items: center;
+        margin-left: 4px;
+    }
+    .board-avatar-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: 700;
+        margin-right: -6px;
+        border: 2px solid var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFFFFF;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        cursor: pointer;
+        transition: transform 0.1s ease;
+    }
+    .board-avatar-circle:hover {
+        transform: scale(1.1);
+        z-index: 10;
+    }
+    .board-filter-select {
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text-subtle);
+        outline: none;
+        cursor: pointer;
+        min-height: auto !important;
+    }
+    .board-filter-select:hover {
+        background: var(--surface-hover);
+        color: var(--text);
+    }
+    .board-controls-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .board-btn-sprint {
+        min-height: 32px !important;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-subtle) !important;
+        box-shadow: none !important;
+    }
+    .board-btn-sprint:hover {
+        background: var(--surface-hover) !important;
+        color: var(--text) !important;
+    }
+    
+    /* Kanban Card Redesign matching screenshot */
+    .kanban-card {
+        background: var(--surface) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: var(--radius) !important;
+        padding: 12px !important;
+        box-shadow: var(--shadow-card) !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease !important;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        position: relative;
+    }
+    .kanban-card.dragging {
+        opacity: 0.5;
+        border-style: dashed;
+        box-shadow: none !important;
+    }
+    .kanban-card-title {
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        color: var(--text) !important;
+        text-decoration: none !important;
+        line-height: 1.4 !important;
+        display: block;
+        margin-bottom: 2px;
+    }
+    .kanban-card-title:hover {
+        color: var(--primary) !important;
+        text-decoration: underline !important;
+    }
+    .kanban-card-due-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--text-subtle);
+        background: var(--surface-hover);
+        padding: 2px 6px;
+        border-radius: 3px;
+        width: fit-content;
+        margin: 4px 0 6px;
+    }
+    .kanban-card-due-icon {
+        font-size: 10px;
+    }
+    .kanban-card-meta-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+    }
+    .kanban-card-meta-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .kanban-card-meta-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .kanban-issue-key {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+    .kanban-issue-type-icon {
+        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .story-points-badge {
+        background: var(--surface-hover);
+        color: var(--text-subtle);
+        font-size: 10px;
+        font-weight: 700;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+    }
+    .priority-badge-mini {
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+    }
+</style>
+
+<!-- Breadcrumbs -->
+<nav class="jira-breadcrumbs">
+    <span>Spaces</span>
+    <span>/</span>
+    <span>{{ current_organization_name or "IssueFlow Workspace" }}</span>
+</nav>
+
+<!-- Page Heading -->
+<div class="board-title-row">
+    <div class="board-title-left">
+        <div class="board-title-avatar">
+            {{ (current_organization_name or "IF")[:2]|upper }}
+        </div>
+        <div class="board-title-text">
+            <h1>{{ current_organization_name or "IssueFlow Workspace" }}</h1>
+        </div>
     </div>
-    <a class="button" href="{{ url_for('bug.add_bug') }}">Create Issue</a>
 </div>
 
-<form method="GET" class="filter-box board-filter">
-    <select name="project" aria-label="Filter board by project">
-        <option value="">All Projects</option>
-        {% for project in projects %}
-            <option value="{{ project.id }}" {% if selected_project == project.id|string %}selected{% endif %}>{{ project.project_key }} · {{ project.name }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Apply</button>
-</form>
+<!-- Tabs sub-nav -->
+<nav class="board-sub-nav">
+    <a href="{{ url_for('bug.dashboard') }}">Summary</a>
+    <a href="#" class="active">Board</a>
+    <a href="{{ url_for('bug.view_bugs') }}">Issues</a>
+    <a href="{{ url_for('report.reports') }}">Reports</a>
+    <a href="{{ url_for('admin.users') }}">Users</a>
+    <a href="{{ url_for('auth.profile') }}">Profile</a>
+    <a href="#">+</a>
+</nav>
 
+<!-- Controls Row -->
+<div class="board-controls-row">
+    <div class="board-controls-left">
+        <!-- Search bar -->
+        <div class="board-search-container">
+            <span class="board-search-icon">🔍</span>
+            <input type="text" class="board-search-input" placeholder="Search board">
+        </div>
+        
+        <!-- Member initials icons mockup -->
+        <div class="board-avatars-list">
+            <span class="board-avatar-circle" style="background: #FF5630;" title="Assignee 1">JD</span>
+            <span class="board-avatar-circle" style="background: #36B37E;" title="Assignee 2">SM</span>
+            <span class="board-avatar-circle" style="background: #FFAB00;" title="Assignee 3">TA</span>
+            <span class="board-avatar-circle" style="background: #00B8D9;" title="Assignee 4">EL</span>
+        </div>
+
+        <!-- Project dropdown filter -->
+        <form method="GET" class="board-filter-form" style="margin: 0; display: inline-block;">
+            <select name="project" aria-label="Filter board by project" class="board-filter-select" onchange="this.form.submit()">
+                <option value="">All Projects</option>
+                {% for project in projects %}
+                    <option value="{{ project.id }}" {% if selected_project == project.id|string %}selected{% endif %}>{{ project.project_key }} · {{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="board-controls-right">
+        <!-- Complete sprint button mockup -->
+        <button class="button board-btn-sprint">Complete sprint</button>
+        <!-- Create Issue link button -->
+        <a class="button btn-create-issue" href="{{ url_for('bug.add_bug') }}" style="text-decoration: none;">+ Create</a>
+    </div>
+</div>
+
+<!-- Kanban Columns container -->
 <section class="kanban-board">
     {% for status, issues in columns.items() %}
-        <div class="kanban-column">
+        <div class="kanban-column" data-status="{{ status }}">
             <div class="kanban-column-heading">
                 <h2>{{ status }}</h2>
-                <span>{{ issues|length }}</span>
+                <span class="kanban-column-count">{{ issues|length }}</span>
             </div>
+            
             <div class="kanban-cards">
                 {% for issue in issues %}
-                    <article class="kanban-card">
-                        <div class="kanban-card-meta">
-                            <span>{{ issue.issue_type }}</span>
-                            <strong>{{ issue.issue_key }}</strong>
-                        </div>
+                    <article class="kanban-card" data-id="{{ issue.id }}" data-key="{{ issue.issue_key }}" data-update-url="{{ url_for('bug.update_status', bug_id=issue.id) }}">
+                        <!-- Card Title -->
                         <a class="kanban-card-title" href="{{ url_for('bug.bug_details', bug_id=issue.id) }}">{{ issue.title }}</a>
-                        <div class="label-row">
-                            {% for label in issue.label_list %}<span class="issue-label">{{ label }}</span>{% endfor %}
+                        
+                        <!-- Due Date Row -->
+                        {% if issue.due_date %}
+                            <div class="kanban-card-due-date" title="Due Date: {{ issue.due_date }}">
+                                <span class="kanban-card-due-icon">📅</span>
+                                <span>{{ issue.due_date }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Labels Row -->
+                        {% if issue.label_list %}
+                        <div class="label-row" style="margin-top: 4px; margin-bottom: 4px;">
+                            {% for label in issue.label_list %}
+                                <span class="issue-label">{{ label }}</span>
+                            {% endfor %}
                         </div>
-                        <div class="kanban-card-footer">
-                            <span>{{ issue.priority }}</span>
-                            <span>{{ issue.story_points or '–' }} pts</span>
-                            <span>{{ issue.assignee_name or 'Unassigned' }}</span>
+                        {% endif %}
+                        
+                        <!-- Card Footer: Issue info & Priority/Points/Assignee -->
+                        <div class="kanban-card-meta-bottom">
+                            <div class="kanban-card-meta-left">
+                                <!-- Issue Type Icon Badge -->
+                                <span class="kanban-issue-type-icon" title="Type: {{ issue.issue_type }}">
+                                    {% if issue.issue_type == 'Bug' %}
+                                        🔴
+                                    {% elif issue.issue_type == 'Story' %}
+                                        🟢
+                                    {% elif issue.issue_type == 'Task' %}
+                                        🟣
+                                    {% elif issue.issue_type == 'Epic' %}
+                                        ⚡
+                                    {% else %}
+                                        ⎋
+                                    {% endif %}
+                                </span>
+                                <!-- Issue Key Link -->
+                                <strong class="kanban-issue-key">{{ issue.issue_key }}</strong>
+                            </div>
+                            
+                            <div class="kanban-card-meta-right">
+                                <!-- Priority Icon -->
+                                <span class="priority-badge-mini" title="Priority: {{ issue.priority }}">
+                                    {% if issue.priority in ['Urgent', 'Highest'] %}
+                                        <span class="priority-icon priority-highest">▲</span>
+                                    {% elif issue.priority == 'High' %}
+                                        <span class="priority-icon priority-high">▲</span>
+                                    {% elif issue.priority == 'Medium' %}
+                                        <span class="priority-icon priority-medium">＝</span>
+                                    {% elif issue.priority == 'Low' %}
+                                        <span class="priority-icon priority-low">▼</span>
+                                    {% else %}
+                                        <span class="priority-icon priority-lowest">▼</span>
+                                    {% endif %}
+                                </span>
+                                
+                                <!-- Estimate point bubble -->
+                                {% if issue.story_points %}
+                                    <span class="story-points-badge" title="Estimate: {{ issue.story_points }} points">{{ issue.story_points }}</span>
+                                {% endif %}
+                                
+                                <!-- Assignee Circle Initials -->
+                                <div class="kanban-card-assignee">
+                                    {% if issue.assigned_to %}
+                                        <span class="user-avatar-initial" title="Assigned to: {{ issue.assignee_name }}" style="width: 22px; height: 22px; font-size: 10px; background: var(--primary-subtle); color: var(--primary); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;">
+                                            {{ issue.assignee_name[:1]|upper }}{{ issue.assignee_name.split(' ')[1][:1]|upper if ' ' in issue.assignee_name else '' }}
+                                        </span>
+                                    {% else %}
+                                        <span class="user-avatar-initial" title="Unassigned" style="width: 22px; height: 22px; font-size: 10px; background: var(--surface-hover); color: var(--text-muted); border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center;">
+                                            👤
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Quick Move Controls for assigned developer -->
                         {% if current_user_role == 'developer' and issue.assigned_to == current_user_id %}
-                            <form method="POST" action="{{ url_for('bug.update_status', bug_id=issue.id) }}">
+                            <form method="POST" action="{{ url_for('bug.update_status', bug_id=issue.id) }}" style="margin-top: 8px; border-top: 1px solid var(--border); padding-top: 6px;">
                                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                                 <input type="hidden" name="return_to" value="board">
                                 <input type="hidden" name="project" value="{{ selected_project }}">
-                                <select name="status" aria-label="Update {{ issue.issue_key }} status">
-                                    {% for option in statuses %}
-                                        <option value="{{ option }}" {% if issue.status == option %}selected{% endif %}>{{ option }}</option>
-                                    {% endfor %}
-                                </select>
-                                <button type="submit">Move</button>
+                                <div style="display: flex; gap: 4px; align-items: center; width: 100%;">
+                                    <select name="status" aria-label="Update {{ issue.issue_key }} status" style="min-height: 24px; font-size: 11px; padding: 2px 4px; flex-grow: 1;">
+                                        {% for option in statuses %}
+                                            <option value="{{ option }}" {% if issue.status == option %}selected{% endif %}>{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" style="min-height: 24px; padding: 2px 8px; font-size: 11px;">Move</button>
+                                </div>
                             </form>
                         {% endif %}
                     </article>
                 {% else %}
-                    <p class="empty">No issues</p>
+                    <p class="empty" style="font-size: 12px; padding: 12px 0;">No issues</p>
                 {% endfor %}
             </div>
         </div>
     {% endfor %}
 </section>
+{% if pagination.total_pages > 1 %}
+<nav class="pagination" aria-label="Board pages">
+    {% if pagination.has_previous %}
+        <a href="{{ url_for('project.board', project=selected_project, page=pagination.page - 1) }}">Previous</a>
+    {% endif %}
+    <span>Page {{ pagination.page }} of {{ pagination.total_pages }} · {{ pagination.total_items }} issues</span>
+    {% if pagination.has_next %}
+        <a href="{{ url_for('project.board', project=selected_project, page=pagination.page + 1) }}">Next</a>
+    {% endif %}
+</nav>
+{% endif %}
 {% endblock %}

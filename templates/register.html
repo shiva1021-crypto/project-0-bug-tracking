@@ -1,27 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Bug Tracking Tool{% endblock %}
+{% block title %}Sign up - IssueFlow{% endblock %}
+{% block body_class %}auth-page{% endblock %}
 
 {% block content %}
-<section class="form-card compact">
-    <h1>Register</h1>
-    <form method="POST" novalidate>
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <label for="full_name">Full Name</label>
-        <input id="full_name" type="text" name="full_name" autocomplete="name" required>
+<div class="auth-container">
+    <section class="form-card compact panel">
+        <h1>Sign up for your account</h1>
+        <form method="POST" novalidate style="margin-top: 16px;">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <div class="hp-field" aria-hidden="true">
+                <label for="website">Website</label>
+                <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input id="full_name" type="text" name="full_name" autocomplete="name" required placeholder="Enter full name">
+            </div>
 
-        <label for="email">Email</label>
-        <input id="email" type="email" name="email" autocomplete="email" required>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input id="email" type="email" name="email" autocomplete="email" required placeholder="Enter email address">
+            </div>
 
-        <label for="password">Password</label>
-        <input id="password" type="password" name="password" autocomplete="new-password" minlength="8" required>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" autocomplete="new-password" minlength="8" required placeholder="Create strong password (min 8 chars)">
+            </div>
 
-        <label for="organization_name">Organization</label>
-        <input id="organization_name" type="text" name="organization_name" autocomplete="organization" maxlength="120" required>
+            <div class="form-group">
+                <label for="organization_name">Existing Organization Name</label>
+                <input id="organization_name" type="text" name="organization_name" autocomplete="organization" maxlength="120" required placeholder="Enter your organization's exact name">
+            </div>
 
-        <p class="muted">The first user in an organization becomes admin. Later users join as testers until an admin changes their role.</p>
+            <p class="muted" style="margin-bottom: 16px; text-align: left; font-size: 11px;">
+                Your request will be reviewed by an organization administrator before you can sign in.
+            </p>
 
-        <button type="submit">Register</button>
-    </form>
-</section>
+            <button type="submit" style="width: 100%; min-height: 40px;">Request access</button>
+        </form>
+        <p class="muted">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+    </section>
+</div>
 {% endblock %}

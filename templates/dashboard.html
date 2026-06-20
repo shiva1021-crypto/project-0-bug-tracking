@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Bug Tracking Tool{% endblock %}
+{% block title %}Dashboard — IssueFlow{% endblock %}
 
 {% block content %}
 <div class="page-heading">
@@ -8,65 +8,119 @@
         <p class="eyebrow">Overview</p>
         <h1>Dashboard</h1>
     </div>
-    <a class="button" href="{{ url_for('bug.add_bug') }}">Create Issue</a>
+    <a class="button" href="{{ url_for('bug.add_bug') }}">+ Create Issue</a>
 </div>
 
-<section class="stats-grid">
+<!-- Metrics Cards Section -->
+<section class="stats-grid" style="margin-bottom: 24px;">
     <article class="stat-card">
         <span>Total Issues</span>
         <strong>{{ stats.total_bugs or 0 }}</strong>
     </article>
     <article class="stat-card">
         <span>Open</span>
-        <strong>{{ stats.open_bugs or 0 }}</strong>
+        <strong style="color: var(--primary);">{{ stats.open_bugs or 0 }}</strong>
     </article>
     <article class="stat-card">
         <span>In Progress</span>
-        <strong>{{ stats.in_progress_bugs or 0 }}</strong>
+        <strong style="color: var(--warning);">{{ stats.in_progress_bugs or 0 }}</strong>
     </article>
     <article class="stat-card">
         <span>Resolved</span>
-        <strong>{{ stats.resolved_bugs or 0 }}</strong>
+        <strong style="color: var(--success);">{{ stats.resolved_bugs or 0 }}</strong>
     </article>
-    <article class="stat-card">
-        <span>Critical</span>
-        <strong>{{ stats.critical_bugs or 0 }}</strong>
+    <article class="stat-card" style="border-left: 4px solid var(--danger);">
+        <span style="color: var(--danger);">Critical</span>
+        <strong style="color: var(--danger);">{{ stats.critical_bugs or 0 }}</strong>
     </article>
 </section>
 
+<!-- Recent Issues Section -->
 <section class="panel">
     <div class="section-heading">
         <h2>Recent Issues</h2>
-        <a href="{{ url_for('bug.view_bugs') }}">View all</a>
+        <a href="{{ url_for('bug.view_bugs') }}" class="button button-secondary" style="min-height: 28px; padding: 4px 10px; font-size: 12px;">View all issues</a>
     </div>
+    
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>Key</th>
-                    <th>Type</th>
+                    <th style="width: 100px;">Key</th>
+                    <th style="width: 125px;">Type</th>
                     <th>Title</th>
-                    <th>Priority</th>
-                    <th>Severity</th>
-                    <th>Status</th>
-                    <th>Assigned</th>
-                    <th></th>
+                    <th style="width: 120px;">Priority</th>
+                    <th style="width: 120px;">Severity</th>
+                    <th style="width: 130px;">Status</th>
+                    <th style="width: 160px;">Assignee</th>
+                    <th style="width: 80px;"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for bug in recent_bugs %}
                     <tr>
-                        <td><strong>{{ bug.issue_key }}</strong></td>
-                        <td>{{ bug.issue_type }}</td>
-                        <td>{{ bug.title }}</td>
-                        <td><span class="badge">{{ bug.priority }}</span></td>
-                        <td><span class="badge severity">{{ bug.severity }}</span></td>
-                        <td><span class="status">{{ bug.status }}</span></td>
-                        <td>{{ bug.developer_name or "Not Assigned" }}</td>
-                        <td><a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">View</a></td>
+                        <td><strong style="color: var(--text-muted);">{{ bug.issue_key }}</strong></td>
+                        <td>
+                            <span class="issue-type-badge type-{{ bug.issue_type.lower() }}" style="font-size: 11px;">
+                                {% if bug.issue_type == 'Bug' %}
+                                    <span class="type-icon">🔴</span>
+                                {% elif bug.issue_type == 'Story' %}
+                                    <span class="type-icon">🟢</span>
+                                {% elif bug.issue_type == 'Task' %}
+                                    <span class="type-icon">🔵</span>
+                                {% elif bug.issue_type == 'Epic' %}
+                                    <span class="type-icon">⚡</span>
+                                {% else %}
+                                    <span class="type-icon">⎋</span>
+                                {% endif %}
+                                {{ bug.issue_type }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}" style="font-weight: 600; color: var(--text);">{{ bug.title }}</a>
+                        </td>
+                        <td>
+                            <span class="priority-badge" title="Priority: {{ bug.priority }}">
+                                {% if bug.priority in ['Urgent', 'Highest'] %}
+                                    <span class="priority-icon priority-highest">▲</span>
+                                {% elif bug.priority == 'High' %}
+                                    <span class="priority-icon priority-high">▲</span>
+                                {% elif bug.priority == 'Medium' %}
+                                    <span class="priority-icon priority-medium">＝</span>
+                                {% elif bug.priority == 'Low' %}
+                                    <span class="priority-icon priority-low">▼</span>
+                                {% else %}
+                                    <span class="priority-icon priority-lowest">▼</span>
+                                {% endif %}
+                                <span style="font-size: 12px; font-weight: 600; margin-left: 4px; color: var(--text-subtle);">{{ bug.priority }}</span>
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-weight: 500; font-size: 13px;">{{ bug.severity }}</span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ bug.status.lower().replace(' ', '_') }}">{{ bug.status }}</span>
+                        </td>
+                        <td>
+                            {% if bug.developer_name %}
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="user-avatar-initial" style="width: 22px; height: 22px; font-size: 10px; background: var(--primary-subtle); color: var(--primary);">
+                                        {{ bug.developer_name[:1]|upper }}{{ bug.developer_name.split(' ')[1][:1]|upper if ' ' in bug.developer_name else '' }}
+                                    </span>
+                                    <span style="font-weight: 500;">{{ bug.developer_name }}</span>
+                                </div>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-style: italic;">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('bug.bug_details', bug_id=bug.id) }}" class="button button-secondary" style="min-height: 26px; padding: 2px 8px; font-size: 11px;">View</a>
+                        </td>
                     </tr>
                 {% else %}
-                    <tr><td colspan="8" class="empty">No issues created yet.</td></tr>
+                    <tr>
+                        <td colspan="8" class="empty">No issues created yet in your workspace.</td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>

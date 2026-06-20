@@ -164,11 +164,11 @@ Loads environment variables and creates the MySQL database connection.
 
 ### routes/auth_routes.py
 
-Handles registration, login, logout, password hashing, and session creation.
+Handles rate-limited access requests, email verification, login, logout, password hashing, and session creation. New accounts require organization-admin approval.
 
 ### routes/bug_routes.py
 
-Handles dashboard data, bug creation, bug listing, bug details, bug editing, assignment, status updates, comments, screenshot uploads, and audit history.
+Handles dashboard data, issue creation, listing, details, editing, screenshot uploads, and audit history. Workflow mutations are separated into `workflow_routes.py`, reusable hierarchy rules live in `services/issue_service.py`, and shared queries live in `repositories/issue_repository.py`.
 
 ### routes/report_routes.py
 

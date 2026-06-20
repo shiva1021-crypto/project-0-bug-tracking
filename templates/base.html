@@ -3,53 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Bug Tracking Tool{% endblock %}</title>
+    <title>{% block title %}IssueFlow — Work Management{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="{% block body_class %}{% endblock %}">
-    <nav class="navbar">
-        <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">IF</span><span>IssueFlow<small>Work management</small></span></a>
-        <button class="nav-toggle" type="button" aria-label="Toggle navigation">Menu</button>
-        <div class="nav-links">
+    <div class="app-layout">
+        <!-- Global Top Header -->
+        <header class="jira-header">
+            <div class="jira-header-left">
+                <button class="nav-toggle" type="button" aria-label="Toggle navigation" style="display: none;">Menu</button>
+                <a class="brand" href="{{ url_for('index') }}">
+                    <span class="brand-mark">IF</span>
+                    <span>IssueFlow<small>Work management</small></span>
+                </a>
+                {% if current_user_id %}
+                <nav class="header-nav">
+                    <a href="{{ url_for('bug.dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('project.projects') }}">Projects</a>
+                    <a href="{{ url_for('bug.view_bugs') }}">Issues</a>
+                    <a class="btn-create-issue" href="{{ url_for('bug.add_bug') }}">+ Create</a>
+                </nav>
+                {% endif %}
+            </div>
+            
+            <div class="jira-header-right">
+                {% if current_user_id %}
+                    <span class="org-indicator">{{ current_organization_name }}</span>
+                    <a class="user-profile-link" href="{{ url_for('auth.profile') }}">
+                        <span class="user-avatar-initial">{{ current_user_name[:1] }}</span>
+                        {{ current_user_name }}
+                    </a>
+                    <form class="nav-logout" method="post" action="{{ url_for('auth.logout') }}" style="display: inline-block; margin-left: 8px;">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                        <button class="button-secondary" type="submit" style="min-height: 28px; padding: 4px 10px; font-size: 12px;">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="button-secondary" href="{{ url_for('auth.login') }}" style="min-height: 32px; padding: 6px 12px; font-size: 13px; font-weight: 700; margin-right: 8px;">Log In</a>
+                    <a class="button" href="{{ url_for('auth.register') }}" style="min-height: 32px; padding: 6px 12px; font-size: 13px; font-weight: 700;">Get it free</a>
+                {% endif %}
+                <button class="theme-toggle" type="button" aria-label="Toggle dark mode">◐ Theme</button>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Collapsible Left Sidebar (Visible if logged in and not on public landing/auth pages) -->
             {% if current_user_id %}
-                <a href="{{ url_for('bug.dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('project.board') }}">Board</a>
-                <a href="{{ url_for('project.projects') }}">Projects</a>
-                <a href="{{ url_for('bug.view_bugs') }}">Issues</a>
-                <a href="{{ url_for('bug.add_bug') }}">Create</a>
-                {% if current_user_role in ['admin', 'project_manager'] %}
-                    <a href="{{ url_for('report.reports') }}">Reports</a>
-                {% endif %}
-                {% if current_user_role == 'admin' %}
-                    <a href="{{ url_for('admin.users') }}">Users</a>
-                {% endif %}
-                <span class="nav-user">{{ current_organization_name }}</span>
-                <a class="nav-user" href="{{ url_for('auth.profile') }}">{{ current_user_name }}</a>
-                <form class="nav-logout" method="post" action="{{ url_for('auth.logout') }}">
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}">Login</a>
-                <a href="{{ url_for('auth.register') }}">Register</a>
-            {% endif %}
-            <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><span aria-hidden="true">◐</span> Theme</button>
-        </div>
-    </nav>
-
-    <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="alerts">
-                    {% for category, message in messages %}
-                        <div class="alert {{ category }}">{{ message }}</div>
-                    {% endfor %}
+            <aside class="jira-sidebar" id="jiraSidebar">
+                <div class="sidebar-top">
+                    <!-- Context Project / Organization Info -->
+                    <div class="sidebar-project-info">
+                        <span class="sidebar-project-avatar">IF</span>
+                        <div class="sidebar-project-info-text">
+                            <span class="sidebar-project-name">IssueFlow Workspace</span>
+                            <span class="sidebar-project-type">Software Project</span>
+                        </div>
+                    </div>
+                    <!-- Menu Navigation list -->
+                    <ul class="jira-sidebar-nav">
+                        <li>
+                            <a href="{{ url_for('bug.dashboard') }}" class="{% if request.path == url_for('bug.dashboard') %}active{% endif %}">
+                                <span class="sidebar-icon">📊</span>
+                                <span class="sidebar-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('project.board') }}" class="{% if request.path == url_for('project.board') %}active{% endif %}">
+                                <span class="sidebar-icon">📋</span>
+                                <span class="sidebar-text">Kanban Board</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('project.projects') }}" class="{% if request.path == url_for('project.projects') %}active{% endif %}">
+                                <span class="sidebar-icon">📁</span>
+                                <span class="sidebar-text">Projects</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('bug.view_bugs') }}" class="{% if request.path == url_for('bug.view_bugs') %}active{% endif %}">
+                                <span class="sidebar-icon">🔍</span>
+                                <span class="sidebar-text">Issues List</span>
+                            </a>
+                        </li>
+                        {% if current_user_role in ['admin', 'project_manager'] %}
+                        <li>
+                            <a href="{{ url_for('report.reports') }}" class="{% if request.path == url_for('report.reports') %}active{% endif %}">
+                                <span class="sidebar-icon">📈</span>
+                                <span class="sidebar-text">Reports</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% if current_user_role == 'admin' %}
+                        <li>
+                            <a href="{{ url_for('admin.users') }}" class="{% if request.path == url_for('admin.users') %}active{% endif %}">
+                                <span class="sidebar-icon">👥</span>
+                                <span class="sidebar-text">Users</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <a href="{{ url_for('auth.profile') }}" class="{% if request.path == url_for('auth.profile') %}active{% endif %}">
+                                <span class="sidebar-icon">👤</span>
+                                <span class="sidebar-text">Your Profile</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
+                <!-- Sidebar Collapse Button -->
+                <button class="sidebar-collapse-btn" type="button">
+                    <span class="sidebar-arrow">◀</span>
+                </button>
+            </aside>
             {% endif %}
-        {% endwith %}
 
-        {% block content %}{% endblock %}
-    </main>
+            <!-- Main Content Area -->
+            <main class="jira-main-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="alerts">
+                            {% for category, message in messages %}
+                                <div class="alert {{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>

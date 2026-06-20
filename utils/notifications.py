@@ -1,10 +1,12 @@
 import logging
 import os
 import smtplib
+from concurrent.futures import ThreadPoolExecutor
 from email.message import EmailMessage
 
 
 logger = logging.getLogger(__name__)
+_email_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="issueflow-email")
 
 
 def send_email(to_email, subject, body):
@@ -36,3 +38,9 @@ def send_email(to_email, subject, body):
     except Exception as exc:
         logger.warning("Email notification failed: %s", exc)
         return False
+
+
+def queue_email(to_email, subject, body):
+    if not to_email:
+        return None
+    return _email_executor.submit(send_email, to_email, subject, body)

@@ -1,96 +1,115 @@
 {% extends "base.html" %}
 
-{% block title %}Edit {{ bug.issue_key }} - Bug Tracking Tool{% endblock %}
+{% block title %}Edit {{ bug.issue_key }} — IssueFlow{% endblock %}
 
 {% block content %}
-<section class="form-card">
-    <h1>Edit {{ bug.issue_key }}</h1>
-    <form method="POST" enctype="multipart/form-data" novalidate>
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-        <label for="title">Summary</label>
-        <input id="title" type="text" name="title" maxlength="150" value="{{ bug.title }}" required>
-
-        <label for="description">Description</label>
-        <textarea id="description" name="description" required>{{ bug.description }}</textarea>
-
-        <label for="reproduction_steps">Reproduction Steps</label>
-        <textarea id="reproduction_steps" name="reproduction_steps">{{ bug.reproduction_steps or "" }}</textarea>
-
-        <div class="two-column">
-            <div>
-                <label for="issue_type">Work Type</label>
-                <select id="issue_type" name="issue_type" required>
-                    {% for issue_type in issue_types %}
-                        <option value="{{ issue_type }}" {% if bug.issue_type == issue_type %}selected{% endif %}>{{ issue_type }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label for="parent_id">Parent Issue</label>
-                <select id="parent_id" name="parent_id">
-                    <option value="">No parent</option>
-                    {% for parent in parents %}
-                        <option value="{{ parent.id }}" {% if bug.parent_id == parent.id %}selected{% endif %}>{{ parent.issue_key }} · {{ parent.title }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+<div class="jira-main-content-narrow">
+    <div class="page-heading" style="margin-bottom: 20px;">
+        <div>
+            <p class="eyebrow">{{ bug.project_name }} · Edit lifecycle</p>
+            <h1>Edit {{ bug.issue_key }}</h1>
         </div>
+    </div>
 
-        <div class="two-column">
-            <div>
-                <label for="category">Category</label>
-                <select id="category" name="category" required>
-                    {% for category in categories %}
-                        <option value="{{ category }}" {% if bug.category == category %}selected{% endif %}>{{ category }}</option>
-                    {% endfor %}
-                </select>
+    <section class="panel form-card">
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-group">
+                <label for="title">Summary (Title) *</label>
+                <input id="title" type="text" name="title" maxlength="150" value="{{ bug.title }}" required placeholder="Enter summary">
             </div>
-            <div>
-                <label for="external_issue_url">External Issue URL</label>
-                <input id="external_issue_url" type="url" name="external_issue_url" value="{{ bug.external_issue_url or '' }}" placeholder="https://github.com/...">
-            </div>
-        </div>
 
-        <div class="two-column">
-            <div>
-                <label for="labels">Labels</label>
-                <input id="labels" type="text" name="labels" maxlength="255" value="{{ bug.labels or '' }}">
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" required placeholder="Provide a detailed description of the issue...">{{ bug.description }}</textarea>
             </div>
-            <div>
-                <label for="story_points">Story Points</label>
-                <input id="story_points" type="number" name="story_points" min="1" max="100" value="{{ bug.story_points or '' }}">
+
+            <div class="form-group">
+                <label for="reproduction_steps">Reproduction Steps</label>
+                <textarea id="reproduction_steps" name="reproduction_steps" placeholder="List steps to reproduce, actual vs expected results..." style="min-height: 80px;">{{ bug.reproduction_steps or "" }}</textarea>
             </div>
-        </div>
 
-        <label for="due_date">Due Date</label>
-        <input id="due_date" type="date" name="due_date" value="{{ bug.due_date or '' }}">
-
-        <div class="two-column">
-            <div>
-                <label for="priority">Priority</label>
-                <select id="priority" name="priority" required>
-                    {% for priority in priorities %}
-                        <option value="{{ priority }}" {% if bug.priority == priority %}selected{% endif %}>{{ priority }}</option>
-                    {% endfor %}
-                </select>
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="issue_type">Work Type *</label>
+                    <select id="issue_type" name="issue_type" required>
+                        {% for issue_type in issue_types %}
+                            <option value="{{ issue_type }}" {% if bug.issue_type == issue_type %}selected{% endif %}>{{ issue_type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="parent_id">Parent Issue</label>
+                    <select id="parent_id" name="parent_id">
+                        <option value="">No parent</option>
+                        {% for parent in parents %}
+                            <option value="{{ parent.id }}" {% if bug.parent_id == parent.id %}selected{% endif %}>{{ parent.issue_key }} · {{ parent.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-            <div>
-                <label for="severity">Severity</label>
-                <select id="severity" name="severity" required>
-                    {% for severity in severities %}
-                        <option value="{{ severity }}" {% if bug.severity == severity %}selected{% endif %}>{{ severity }}</option>
-                    {% endfor %}
-                </select>
+
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        {% for category in categories %}
+                            <option value="{{ category }}" {% if bug.category == category %}selected{% endif %}>{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="external_issue_url">External Reference URL</label>
+                    <input id="external_issue_url" type="url" name="external_issue_url" value="{{ bug.external_issue_url or '' }}" placeholder="e.g. https://github.com/...">
+                </div>
             </div>
-        </div>
 
-        <label for="screenshot">Replace Screenshot</label>
-        <input id="screenshot" type="file" name="screenshot" accept="image/png,image/jpeg,image/gif,image/webp">
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="labels">Labels</label>
+                    <input id="labels" type="text" name="labels" maxlength="255" value="{{ bug.labels or '' }}" placeholder="frontend, backend">
+                </div>
+                <div class="form-group">
+                    <label for="story_points">Story Points (Estimate)</label>
+                    <input id="story_points" type="number" name="story_points" min="1" max="100" value="{{ bug.story_points or '' }}" placeholder="e.g. 1, 2, 3, 5, 8">
+                </div>
+            </div>
 
-        <div class="action-row">
-            <button type="submit">Save Changes</button>
-            <a class="button button-secondary" href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">Cancel</a>
-        </div>
-    </form>
-</section>
+            <div class="form-group">
+                <label for="due_date">Due Date</label>
+                <input id="due_date" type="date" name="due_date" value="{{ bug.due_date or '' }}">
+            </div>
+
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="priority">Priority *</label>
+                    <select id="priority" name="priority" required>
+                        {% for priority in priorities %}
+                            <option value="{{ priority }}" {% if bug.priority == priority %}selected{% endif %}>{{ priority }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="severity">Severity *</label>
+                    <select id="severity" name="severity" required>
+                        {% for severity in severities %}
+                            <option value="{{ severity }}" {% if bug.severity == severity %}selected{% endif %}>{{ severity }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label for="screenshot">Replace Screenshot Attachment</label>
+                <input id="screenshot" type="file" name="screenshot" accept="image/png,image/jpeg,image/gif,image/webp" style="padding-top: 6px;">
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 16px;">
+                <a class="button button-secondary" href="{{ url_for('bug.bug_details', bug_id=bug.id) }}">Cancel</a>
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </section>
+</div>
 {% endblock %}

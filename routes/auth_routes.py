@@ -1,10 +1,15 @@
-import re
+import hashlib
+import secrets
+from datetime import datetime
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
+from mysql.connector import Error
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from config import db_cursor, get_db_connection
 from utils.decorators import login_required
+from utils.notifications import queue_email
+from utils.rate_limit import rate_limit_exceeded
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -20,42 +25,150 @@ def register():
         password = request.form.get("password", "")
         organization_name = request.form.get("organization_name", "").strip()
 
+        if request.form.get("website", "").strip():
+            flash("Your access request has been submitted for review.", "success")
+            return redirect(url_for("auth.login"))
+
+        if rate_limit_exceeded(
+            "register_ip", request.remote_addr, limit=5, window_seconds=3600
+        ):
+            flash("Too many registration attempts. Please try again later.", "error")
+            return redirect(url_for("auth.register"))
+
         if not full_name or not email or not organization_name or len(password) < 8:
             flash("Please provide valid registration details.", "error")
             return redirect(url_for("auth.register"))
 
+        admin_emails = []
+        verification_token = None
         try:
-            with db_cursor(commit=True) as cursor:
+            with db_cursor(dictionary=True, commit=True) as cursor:
                 cursor.execute("SELECT id FROM organizations WHERE name = %s", (organization_name,))
-                if cursor.fetchone():
-                    flash("That organization already exists. Ask your admin to create your account.", "error")
+                organization = cursor.fetchone()
+                if not organization:
+                    flash("Organization not found. Ask your administrator for the exact name.", "error")
                     return redirect(url_for("auth.register"))
 
-                cursor.execute("INSERT INTO organizations (name) VALUES (%s)", (organization_name,))
-                organization_id = cursor.lastrowid
-                project_key = re.sub(r"[^A-Za-z0-9]", "", organization_name).upper()[:10]
-                if len(project_key) < 2:
-                    project_key = f"ORG{organization_id}"
                 cursor.execute(
                     """
-                    INSERT INTO projects (organization_id, name, project_key, description)
-                    VALUES (%s, %s, %s, %s)
+                    SELECT id FROM users WHERE email = %s
                     """,
-                    (organization_id, "General", project_key, "Default project"),
+                    (email,),
                 )
+                if cursor.fetchone():
+                    flash("An account with that email already exists.", "error")
+                    return redirect(url_for("auth.login"))
+
                 cursor.execute(
                     """
-                    INSERT INTO users (organization_id, full_name, email, password_hash, role)
-                    VALUES (%s, %s, %s, %s, %s)
+                    SELECT id FROM registration_requests
+                    WHERE organization_id = %s AND email = %s AND status = 'pending'
                     """,
-                    (organization_id, full_name, email, generate_password_hash(password), "admin"),
+                    (organization["id"], email),
                 )
-            flash("Registration successful. Please login.", "success")
+                if cursor.fetchone():
+                    flash("Your access request is already awaiting review.", "error")
+                    return redirect(url_for("auth.login"))
+
+                if current_app.config["REQUIRE_EMAIL_VERIFICATION"]:
+                    verification_token = secrets.token_urlsafe(32)
+                    verification_token_hash = hashlib.sha256(verification_token.encode()).hexdigest()
+                    verified_at = None
+                else:
+                    verification_token_hash = None
+                    verified_at = datetime.utcnow()
+
+                cursor.execute(
+                    """
+                    INSERT INTO registration_requests
+                        (organization_id, full_name, email, password_hash, requester_ip,
+                         verification_token_hash, verified_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (
+                        organization["id"],
+                        full_name,
+                        email,
+                        generate_password_hash(password),
+                        request.remote_addr,
+                        verification_token_hash,
+                        verified_at,
+                    ),
+                )
+                cursor.execute(
+                    "SELECT email FROM users WHERE organization_id = %s AND role = 'admin'",
+                    (organization["id"],),
+                )
+                admin_emails = [row["email"] for row in cursor.fetchall()]
+
+            if verification_token:
+                verification_url = url_for(
+                    "auth.verify_registration", token=verification_token, _external=True
+                )
+                queue_email(
+                    email,
+                    "Verify your IssueFlow access request",
+                    f"Verify your email before an administrator can approve access:\n\n{verification_url}",
+                )
+                flash("Access request submitted. Check your email to verify it before administrator approval.", "success")
+            else:
+                for admin_email in admin_emails:
+                    queue_email(
+                        admin_email,
+                        "New IssueFlow access request",
+                        f"{full_name} ({email}) requested access to {organization_name}.",
+                    )
+                flash("Access request submitted. An administrator must approve it before login.", "success")
             return redirect(url_for("auth.login"))
-        except Exception:
-            flash("Email already exists or registration failed.", "error")
+        except Error:
+            flash("Registration request failed. Please try again.", "error")
 
     return render_template("register.html")
+
+
+@auth_bp.route("/register/verify/<token>")
+def verify_registration(token):
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    admin_emails = []
+    registration = None
+    with db_cursor(dictionary=True, commit=True) as cursor:
+        cursor.execute(
+            """
+            SELECT id, organization_id, full_name, email
+            FROM registration_requests
+            WHERE verification_token_hash = %s AND status = 'pending' AND verified_at IS NULL
+              AND requested_at >= NOW() - INTERVAL 24 HOUR
+            """,
+            (token_hash,),
+        )
+        registration = cursor.fetchone()
+        if registration:
+            cursor.execute(
+                """
+                UPDATE registration_requests
+                SET verified_at = NOW(), verification_token_hash = NULL
+                WHERE id = %s
+                """,
+                (registration["id"],),
+            )
+            cursor.execute(
+                "SELECT email FROM users WHERE organization_id = %s AND role = 'admin'",
+                (registration["organization_id"],),
+            )
+            admin_emails = [row["email"] for row in cursor.fetchall()]
+
+    if not registration:
+        flash("This verification link is invalid or has already been used.", "error")
+        return redirect(url_for("auth.login"))
+
+    for admin_email in admin_emails:
+        queue_email(
+            admin_email,
+            "Verified IssueFlow access request",
+            f"{registration['full_name']} ({registration['email']}) is ready for approval.",
+        )
+    flash("Email verified. An administrator can now approve your access request.", "success")
+    return redirect(url_for("auth.login"))
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
@@ -63,6 +176,13 @@ def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
+
+        login_limited = rate_limit_exceeded(
+            "login_ip", request.remote_addr, limit=50, window_seconds=300
+        ) or rate_limit_exceeded("login_account", email, limit=10, window_seconds=300)
+        if login_limited:
+            flash("Too many login attempts. Please wait before trying again.", "error")
+            return render_template("login.html"), 429
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
