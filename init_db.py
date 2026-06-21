@@ -440,6 +440,7 @@ def main():
             connection_timeout=5,
         )
         cursor = conn.cursor()
+        cursor.execute(f"DROP DATABASE IF EXISTS `{db_name}`")
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`")
         cursor.execute(f"USE `{db_name}`")
 
