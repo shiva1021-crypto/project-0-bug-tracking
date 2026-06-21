@@ -275,7 +275,7 @@ def get_profile_data(user_id, organization_id):
         """
         SELECT COUNT(*) AS total
         FROM bugs
-        WHERE assigned_to = %s AND organization_id = %s AND status IN ('Open', 'In Progress')
+        WHERE assigned_to = %s AND organization_id = %s AND status IN ('To Do', 'In Progress')
         """,
         (user_id, organization_id),
     )

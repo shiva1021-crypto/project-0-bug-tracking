@@ -3,7 +3,7 @@ from datetime import date
 
 PRIORITIES = ("Low", "Medium", "High", "Urgent")
 SEVERITIES = ("Minor", "Major", "Critical", "Blocker")
-STATUSES = ("Open", "In Progress", "Resolved", "Closed")
+STATUSES = ("Idea", "To Do", "In Progress", "Testing", "Done")
 ISSUE_TYPES = ("Epic", "Story", "Task", "Bug", "Subtask")
 STANDARD_TYPES = {"Story", "Task", "Bug"}
 DEFAULT_CATEGORIES = (

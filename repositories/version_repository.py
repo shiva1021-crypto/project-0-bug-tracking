@@ -3,7 +3,7 @@ def get_versions(cursor, organization_id, project_id):
         """
         SELECT v.*,
                COUNT(b.id) AS issue_count,
-               SUM(CASE WHEN b.status IN ('Resolved', 'Closed') THEN 1 ELSE 0 END) AS resolved_count
+               SUM(CASE WHEN b.status IN ('Testing', 'Done') THEN 1 ELSE 0 END) AS resolved_count
         FROM versions v
         LEFT JOIN bugs b ON b.fix_version_id = v.id AND b.organization_id = v.organization_id
         WHERE v.organization_id = %s AND v.project_id = %s

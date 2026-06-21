@@ -169,7 +169,7 @@ class DatabaseWorkflowIntegrationTests(unittest.TestCase):
 
             denied_status = second_developer.post(
                 f"/bugs/{story_id}/status",
-                data={"status": "Resolved"},
+                data={"status": "Testing"},
                 headers={"X-Requested-With": "XMLHttpRequest"},
             )
             self.assertEqual(denied_status.status_code, 403)
@@ -180,14 +180,14 @@ class DatabaseWorkflowIntegrationTests(unittest.TestCase):
 
             allowed_status = applicant.post(
                 f"/bugs/{story_id}/status",
-                data={"status": "Resolved"},
+                data={"status": "Testing"},
                 headers={"X-Requested-With": "XMLHttpRequest"},
             )
             self.assertEqual(allowed_status.status_code, 200)
             self.assertTrue(allowed_status.get_json()["ok"])
             connection.commit()
             cursor.execute("SELECT status FROM bugs WHERE id = %s", (story_id,))
-            self.assertEqual(cursor.fetchone()[0], "Resolved")
+            self.assertEqual(cursor.fetchone()[0], "Testing")
 
             connection.commit()
             cursor.execute("SELECT COUNT(*) FROM bugs WHERE organization_id = %s", (organization_id,))

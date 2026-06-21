@@ -305,6 +305,7 @@ a:hover {
     transition: width var(--transition-speed) cubic-bezier(0.2, 0.8, 0.2, 1);
     z-index: 10;
     flex-shrink: 0;
+    position: relative;
 }
 
 .jira-sidebar.collapsed {
@@ -434,34 +435,43 @@ a:hover {
     padding: 10px 0;
 }
 
-/* Collapse Toggle Button at Sidebar Bottom */
+/* Collapse Toggle Button at Sidebar Right Border Edge */
 .sidebar-collapse-btn {
-    border: none;
-    border-top: 1px solid var(--border);
-    background: transparent;
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
     color: var(--text-muted);
     cursor: pointer;
-    padding: 14px 16px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    font-weight: 700;
-    font-size: 14px;
-    transition: background var(--transition-speed);
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    z-index: 100;
+    transition: transform var(--transition-speed), background var(--transition-speed), opacity var(--transition-speed);
+    opacity: 0.8;
 }
 
 .sidebar-collapse-btn:hover {
+    opacity: 1;
     background: var(--surface-hover);
     color: var(--text);
 }
 
 .jira-sidebar.collapsed .sidebar-collapse-btn {
-    justify-content: center;
+    /* Keep centered on border even when collapsed */
+    right: -12px;
 }
 
 .sidebar-arrow {
     transition: transform var(--transition-speed);
     display: inline-block;
+    font-size: 9px;
 }
 
 .jira-sidebar.collapsed .sidebar-arrow {
@@ -895,7 +905,7 @@ tbody tr:last-child td {
     border: 1px solid transparent;
 }
 
-.status-todo {
+.status-to_do, .status-todo {
     background: var(--surface-hover);
     color: var(--text-subtle);
     border-color: var(--border);
@@ -907,13 +917,19 @@ tbody tr:last-child td {
     border-color: var(--primary);
 }
 
-.status-resolved {
+.status-idea, .status-resolved {
     background: var(--accent-subtle);
     color: var(--accent);
     border-color: var(--accent);
 }
 
-.status-closed {
+.status-testing {
+    background: var(--warning-subtle, #FFF0B3);
+    color: var(--warning, #172B4D);
+    border-color: var(--warning, #FF991F);
+}
+
+.status-done, .status-closed {
     background: var(--success-subtle);
     color: var(--success);
     border-color: var(--success);

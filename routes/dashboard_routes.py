@@ -64,6 +64,7 @@ def register_dashboard_routes(bp):
             flash("Please select a valid widget type and enter a title.", "error")
             return redirect(url_for("bug.dashboard"))
 
+        config = None
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
@@ -123,10 +124,10 @@ def _render_widget_data(cursor, organization_id, widget):
             """
             SELECT
                 COUNT(*) AS total,
-                SUM(status = 'Open') AS open_count,
+                SUM(status = 'To Do') AS todo,
                 SUM(status = 'In Progress') AS in_progress,
-                SUM(status = 'Resolved') AS resolved,
-                SUM(status = 'Closed') AS closed,
+                SUM(status = 'Testing') AS testing,
+                SUM(status = 'Done') AS done,
                 SUM(severity IN ('Critical', 'Blocker')) AS critical
             FROM bugs WHERE organization_id = %s
             """,

@@ -117,7 +117,7 @@ class SecurityAndHelperTests(unittest.TestCase):
             session["organization_id"] = 9
             where, params = build_report_scope(
                 {
-                    "status": "Open",
+                    "status": "To Do",
                     "priority": "High",
                     "project": "4",
                     "start_date": "2026-01-01",
@@ -128,7 +128,7 @@ class SecurityAndHelperTests(unittest.TestCase):
         self.assertIn("bugs.priority = %s", where)
         self.assertIn("bugs.project_id = %s", where)
         self.assertIn("DATE_ADD", where)
-        self.assertEqual(params, [9, "Open", "High", "2026-01-01", "2026-01-31", 4])
+        self.assertEqual(params, [9, "To Do", "High", "2026-01-01", "2026-01-31", 4])
 
     def test_real_image_signature_is_detected(self):
         image_bytes = io.BytesIO()

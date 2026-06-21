@@ -29,9 +29,10 @@
             {% if widget.widget_type == 'stats_summary' and widget.data %}
                 <div class="stats-grid">
                     <article class="stat-card"><span>Total</span><strong>{{ widget.data.total or 0 }}</strong></article>
-                    <article class="stat-card"><span>Open</span><strong style="color:var(--primary);">{{ widget.data.open_count or 0 }}</strong></article>
+                    <article class="stat-card"><span>To Do</span><strong style="color:var(--primary);">{{ widget.data.todo or 0 }}</strong></article>
                     <article class="stat-card"><span>In Progress</span><strong style="color:var(--warning);">{{ widget.data.in_progress or 0 }}</strong></article>
-                    <article class="stat-card"><span>Resolved</span><strong style="color:var(--success);">{{ widget.data.resolved or 0 }}</strong></article>
+                    <article class="stat-card"><span>Testing</span><strong style="color:var(--success);">{{ widget.data.testing or 0 }}</strong></article>
+                    <article class="stat-card" style="border-left:4px solid var(--success);"><span style="color:var(--success);">Done</span><strong style="color:var(--success);">{{ widget.data.done or 0 }}</strong></article>
                     <article class="stat-card" style="border-left:4px solid var(--danger);"><span style="color:var(--danger);">Critical</span><strong style="color:var(--danger);">{{ widget.data.critical or 0 }}</strong></article>
                 </div>
 

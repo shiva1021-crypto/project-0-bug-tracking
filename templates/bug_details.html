@@ -195,7 +195,7 @@
                         <p style="font-size: 12px;">
                             Updated by <strong>{{ item.changed_by_name }}</strong>.
                             {% if item.old_status or item.new_status %}
-                                Status changed from <span class="status-badge status-{{ (item.old_status or 'Open').lower() }}" style="font-size: 9px; padding: 0 4px;">{{ item.old_status or "None" }}</span> to <span class="status-badge status-{{ (item.new_status or 'Open').lower() }}" style="font-size: 9px; padding: 0 4px;">{{ item.new_status or "None" }}</span>.
+                                Status changed from <span class="status-badge status-{{ (item.old_status or 'To Do').lower().replace(' ', '_') }}" style="font-size: 9px; padding: 0 4px;">{{ item.old_status or "None" }}</span> to <span class="status-badge status-{{ (item.new_status or 'To Do').lower().replace(' ', '_') }}" style="font-size: 9px; padding: 0 4px;">{{ item.new_status or "None" }}</span>.
                             {% endif %}
                             {% if item.old_developer_name or item.new_developer_name %}
                                 Assignment changed from <em>{{ item.old_developer_name or "Unassigned" }}</em> to <em>{{ item.new_developer_name or "Unassigned" }}</em>.

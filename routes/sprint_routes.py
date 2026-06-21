@@ -168,7 +168,7 @@ def register_sprint_routes(bp):
             FROM bug_history h
             JOIN bugs b ON h.bug_id = b.id
             WHERE b.sprint_id = %s
-              AND h.new_status IN ('Resolved', 'Closed')
+              AND h.new_status IN ('Testing', 'Done')
               AND DATE(h.changed_at) >= %s
               AND DATE(h.changed_at) <= COALESCE(%s, CURDATE())
             GROUP BY DATE(h.changed_at)

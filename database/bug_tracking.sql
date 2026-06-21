@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS bugs (
     category VARCHAR(80) NOT NULL DEFAULT 'General',
     priority ENUM('Low', 'Medium', 'High', 'Urgent') NOT NULL,
     severity ENUM('Minor', 'Major', 'Critical', 'Blocker') NOT NULL,
-    status ENUM('Open', 'In Progress', 'Resolved', 'Closed') NOT NULL DEFAULT 'Open',
+    status VARCHAR(50) NOT NULL DEFAULT 'To Do',
     reporter_id INT NOT NULL,
     assigned_to INT NULL,
     screenshot_path VARCHAR(255),

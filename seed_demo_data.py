@@ -23,6 +23,7 @@ PROJECTS = (
 )
 
 EXTRA_USERS = (
+    ("Admin User", "admin@example.com", "admin"),
     ("Ava Chen", "ava.admin@example.com", "admin"),
     ("Noah Williams", "noah.manager@example.com", "project_manager"),
     ("Mia Rodriguez", "mia.manager@example.com", "project_manager"),
@@ -180,7 +181,7 @@ def main():
                 title = f"[DEMO] {WORK_ITEMS[(position + project['id'] * 3) % len(WORK_ITEMS)]}"
                 status = weighted_choice(
                     randomizer,
-                    (("Open", 30), ("In Progress", 30), ("Resolved", 24), ("Closed", 16)),
+                    (("Idea", 12), ("To Do", 24), ("In Progress", 28), ("Testing", 20), ("Done", 16)),
                 )
                 priority = weighted_choice(
                     randomizer,
@@ -247,7 +248,7 @@ def main():
                         (bug_id, changed_by, new_status, change_note, changed_at)
                     VALUES (%s, %s, %s, %s, %s)
                     """,
-                    (issue_id, reporter_id, "Open", f"{issue_type} {issue_key} created", created_at),
+                    (issue_id, reporter_id, "To Do", f"{issue_type} {issue_key} created", created_at),
                 )
                 if assigned_to:
                     cursor.execute(
@@ -266,7 +267,8 @@ def main():
                             created_at + timedelta(hours=4),
                         ),
                     )
-                if status != "Open":
+                if status not in ("Idea", "To Do"):
+                    old_status = "Idea" if status == "To Do" else "To Do"
                     cursor.execute(
                         """
                         INSERT INTO bug_history
@@ -277,7 +279,7 @@ def main():
                         (
                             issue_id,
                             assigned_to or reporter_id,
-                            "Open",
+                            old_status,
                             status,
                             "Workflow status updated",
                             created_at + timedelta(days=randomizer.randint(1, 10)),

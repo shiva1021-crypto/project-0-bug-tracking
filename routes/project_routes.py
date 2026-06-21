@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 from mysql.connector import Error
 
 from config import get_db_connection
-from repositories.issue_repository import count_board_issues, get_board_issues, get_projects
+from repositories.issue_repository import count_board_issues, get_board_issues, get_projects, get_developers
 from repositories.sprint_repository import get_sprints
 from services.issue_service import STATUSES
 from utils.decorators import login_required
@@ -92,19 +92,24 @@ def board():
     issues = get_board_issues(
         cursor, session["organization_id"], project_id, page_size, offset, sprint_id
     )
+    developers = get_developers(cursor, session["organization_id"])
     cursor.close()
     conn.close()
 
     columns = {status: [] for status in STATUSES}
     for issue in issues:
         issue["label_list"] = [label.strip() for label in (issue["labels"] or "").split(",") if label.strip()]
-        columns[issue["status"]].append(issue)
+        columns.get(issue["status"], columns["To Do"]).append(issue)
+
+    active_sprint = next((s for s in sprints if s["status"] == "active"), None) if sprints else None
     return render_template(
         "board.html",
         columns=columns,
         statuses=STATUSES,
         projects=projects,
         sprints=sprints,
+        active_sprint=active_sprint,
+        developers=developers,
         selected_project=selected_project,
         pagination=pagination,
     )

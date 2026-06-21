@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const navToggle = document.querySelector(".nav-toggle");
     const jiraSidebar = document.getElementById("jiraSidebar");
     const sidebarCollapseBtn = document.querySelector(".sidebar-collapse-btn");
-    const themeToggle = document.querySelector(".theme-toggle");
+    const themeToggles = document.querySelectorAll(".theme-toggle");
     const printReport = document.querySelector(".print-report");
 
     // 1. Restore dark/light theme
@@ -33,13 +33,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Theme Toggle
-    if (themeToggle) {
-        themeToggle.addEventListener("click", function () {
+    themeToggles.forEach(toggle => {
+        toggle.addEventListener("click", function (e) {
+            e.preventDefault();
             document.body.classList.toggle("dark-mode");
             localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
             Toast.show(`Switched to ${document.body.classList.contains("dark-mode") ? "Dark" : "Light"} mode`, "success");
         });
-    }
+    });
 
     // Print functionality
     if (printReport) {
@@ -465,5 +466,75 @@ document.addEventListener("DOMContentLoaded", function () {
                 '"': '&quot;'
             }[tag] || tag)
         );
+    }
+
+    // Utility placeholder buttons
+    document.querySelectorAll(".placeholder-action-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            const actionName = this.getAttribute("data-action-name") || "Action";
+            Toast.show(`${actionName} is coming soon!`, "info");
+        });
+    });
+
+    // Filter button toggle
+    const filterBtn = document.getElementById("boardFilterBtn");
+    const filterForm = document.querySelector(".board-filter-form");
+    if (filterBtn && filterForm) {
+        filterBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            if (filterForm.style.display === "none" || getComputedStyle(filterForm).display === "none") {
+                filterForm.style.display = "inline-flex";
+            } else {
+                filterForm.style.display = "none";
+            }
+        });
+    }
+
+    // Client-side Group By sorting
+    const boardGroupBy = document.getElementById("boardGroupBy");
+    if (boardGroupBy) {
+        boardGroupBy.addEventListener("change", function() {
+            const grouping = this.value;
+            const columns = document.querySelectorAll(".kanban-column");
+            
+            columns.forEach(col => {
+                const cardsContainer = col.querySelector(".kanban-cards");
+                if (!cardsContainer) return;
+                
+                const cards = Array.from(cardsContainer.querySelectorAll(".kanban-card"));
+                
+                // Store original loaded index if not already present
+                cards.forEach((card, idx) => {
+                    if (!card.hasAttribute("data-original-index")) {
+                        card.setAttribute("data-original-index", idx);
+                    }
+                });
+                
+                if (grouping === "none") {
+                    cards.sort((a, b) => {
+                        return parseInt(a.getAttribute("data-original-index")) - parseInt(b.getAttribute("data-original-index"));
+                    });
+                } else if (grouping === "assignee") {
+                    cards.sort((a, b) => {
+                        const nameA = a.getAttribute("data-assignee-name") || "zzzzzzz";
+                        const nameB = b.getAttribute("data-assignee-name") || "zzzzzzz";
+                        return nameA.localeCompare(nameB);
+                    });
+                } else if (grouping === "priority") {
+                    const priorityMap = { "Urgent": 1, "High": 2, "Medium": 3, "Low": 4 };
+                    cards.sort((a, b) => {
+                        const pA = priorityMap[a.getAttribute("data-priority")] || 9;
+                        const pB = priorityMap[b.getAttribute("data-priority")] || 9;
+                        return pA - pB;
+                    });
+                }
+                
+                // Re-append sorted cards
+                cards.forEach(card => cardsContainer.appendChild(card));
+            });
+            
+            Toast.show(`Grouped board by: ${grouping.charAt(0).toUpperCase() + grouping.slice(1)}`, "success");
+        });
     }
 });

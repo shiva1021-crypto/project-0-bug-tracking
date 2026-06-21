@@ -36,7 +36,7 @@ def register_workflow_routes(bp):
             abort(404)
 
         old_assigned_to, old_status, issue_key = bug
-        new_status = "In Progress" if new_assigned_to and old_status == "Open" else old_status
+        new_status = "In Progress" if new_assigned_to and old_status == "To Do" else old_status
 
         developer = None
         if new_assigned_to:

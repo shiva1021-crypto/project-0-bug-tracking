@@ -193,7 +193,7 @@ def register_bug_routes(bp):
                     INSERT INTO bug_history (bug_id, changed_by, new_status, change_note)
                     VALUES (%s, %s, %s, %s)
                     """,
-                    (bug_id, session["user_id"], "Open", f"{issue_type} {issue_key} created"),
+                    (bug_id, session["user_id"], "To Do", f"{issue_type} {issue_key} created"),
                 )
                 for key, value in request.form.items():
                     if key.startswith("cf_") and value:
