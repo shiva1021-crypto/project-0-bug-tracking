@@ -429,6 +429,8 @@ def main():
 
     print(f"Initializing database from {SCHEMA_FILE}...")
 
+    db_name = os.getenv("DB_NAME", "bug_tracking_db")
+
     try:
         conn = mysql.connector.connect(
             host=host,
@@ -438,8 +440,12 @@ def main():
             connection_timeout=5,
         )
         cursor = conn.cursor()
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`")
+        cursor.execute(f"USE `{db_name}`")
 
-        for statement in split_sql_statements(SCHEMA_FILE.read_text(encoding="utf-8")):
+        sql_text = SCHEMA_FILE.read_text(encoding="utf-8")
+        sql_text = sql_text.replace("bug_tracking_db", db_name)
+        for statement in split_sql_statements(sql_text):
             run_if_needed(cursor, statement)
 
         run_migrations(cursor)
