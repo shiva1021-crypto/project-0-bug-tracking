@@ -11,38 +11,109 @@ A Jira-inspired bug tracking and agile project management tool built with Flask.
 - Python 3.13+
 - MySQL 8.0+ (running locally or remotely)
 
-### Setup
+### Step-by-Step Setup for Client
+
+#### 1. Install Prerequisites
+
+- **Python 3.13+** — Download from https://www.python.org/downloads/
+- **MySQL 8.0+** — Download from https://dev.mysql.com/downloads/installer/
+  - During MySQL installation, **remember the root password** you set
+
+#### 2. Clone the Project
 
 ```bash
-# 1. Clone & enter the project directory
-cd bugtracker
+git clone https://github.com/shiva1021-crypto/project-0-bug-tracking.git
+cd project-0-bug-tracking
+```
 
-# 2. Create a virtual environment
+> Alternatively, if you received the files as a ZIP, extract them and open a terminal in that folder.
+
+#### 3. Create & Activate Virtual Environment
+
+```bash
+# Windows
 python -m venv venv
-venv\Scripts\activate    # Windows
-source venv/bin/activate  # macOS / Linux
+venv\Scripts\activate
 
-# 3. Install dependencies
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+#### 4. Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# 4. Configure environment
-copy .env.example .env   # Windows
-# Edit .env — set DB_PASSWORD to your MySQL root password
+#### 5. Configure Environment
 
-# 5. Verify database connectivity
+```bash
+# Windows
+copy .env.example .env
+
+# macOS / Linux
+cp .env.example .env
+```
+
+Open the `.env` file in a text editor and set your MySQL password:
+
+```
+DB_PASSWORD=your_mysql_password_here
+```
+
+> Leave all other settings at their defaults for first-time setup.
+
+#### 6. Verify Database Connection
+
+```bash
 python check_db.py
+```
 
-# 6. Initialize the database schema
+If you see `OK: MySQL server is reachable`, proceed to the next step.
+
+> **Troubleshooting**: If this fails, make sure MySQL is running (check Services on Windows or `systemctl status mysql` on Linux) and that `DB_PASSWORD` in `.env` is correct.
+
+#### 7. Initialize Database
+
+```bash
 python init_db.py
+```
 
-# 7. (Optional) Seed demo data
+This creates all 14 tables and runs any pending migrations. Expected output:
+
+```
+Initializing database from ...\bug_tracking.sql...
+OK: Database and tables are ready.
+```
+
+#### 8. (Optional) Load Demo Data
+
+```bash
 python seed_demo_data.py
+```
 
-# 8. Run the development server
+This populates the app with 5 sample projects, 18 users, and 150 realistic issues for testing.
+
+#### 9. Start the Application
+
+```bash
 python run_dev.py
 ```
 
-The app starts at **http://localhost:5000**.
+Open your browser and go to **http://localhost:5000**
+
+#### 10. Login
+
+Use the registration page to create your account, or if you ran the demo seed, login with:
+
+| Email | Password | Role |
+|---|---|---|
+| `admin@example.com` | _printed in terminal_ | Admin |
+| `ava.admin@example.com` | _same password_ | Admin |
+| `liam.developer@example.com` | _same password_ | Developer |
+
+The default demo password is printed when you run `seed_demo_data.py`. If not set via `DEMO_SEED_PASSWORD` in `.env`, it will be auto-generated.
 
 ---
 
